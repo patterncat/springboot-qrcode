@@ -16,6 +16,11 @@ public class ColorUtil {
         return Long.decode(argb).intValue();
     }
 
+    /**
+     * 转换为color对象
+     * @param argb
+     * @return
+     */
     public static Color argb2Color(String argb){
         int color = argbString2Int(argb);
         int a = ((0x7f000000 & color) >> 24) | 0x00000080;
@@ -23,5 +28,14 @@ public class ColorUtil {
         int g = (0x0000ff00 & color) >> 8;
         int b = (0x000000ff & color);
         return new Color(r, g, b, a);
+    }
+
+    /**
+     * 判断是否有alpha
+     * @param argb
+     * @return
+     */
+    public static boolean hasTransparency(int argb) {
+        return (argb & 0xFF000000) != 0xFF000000;
     }
 }

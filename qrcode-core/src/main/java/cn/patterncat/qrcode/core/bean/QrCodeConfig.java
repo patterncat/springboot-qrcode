@@ -7,6 +7,7 @@ import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.Builder;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public class QrCodeConfig {
 
     //矩形圆角radius为0
     public static final int RECT_RADIUS = 0;
+    public static final int ROUND_RADIUS = 180;
 
     /**
      * qrcode携带的信息
@@ -93,10 +95,13 @@ public class QrCodeConfig {
 
     /**
      * 整个图片size/logo的size的比例
-     * 默认是5,即logo占图片的1/5
+     * 默认是5,即logo占图片的1/4
      */
     @Builder.Default
-    private int logoSizeRatio = 5;
+    private int logoSizeRatio = 4;
+
+    @Builder.Default
+    private boolean logoRoundCorner = false;
 
     /**
      * logo及border的弧度,默认为矩形,即radius=0
@@ -112,16 +117,20 @@ public class QrCodeConfig {
     private boolean logoBorder = true;
 
     /**
-     * 默认为logo宽度的1/10
+     * 默认为logo边框宽度的1/15
      */
     @Builder.Default
-    private int logoBroderSizeRatio = 10;
+    private int logoBroderSizeRatio = 15;
 
     /**
      * logo边框的颜色,默认是白色
      */
     @Builder.Default
     private String logoBorderColor = WHITE;
+
+    public boolean hasLogo(){
+        return StringUtils.isNotBlank(logo);
+    }
 
     public void validateParams(){
         ValidationUtil.checkNotBlank(msg,"msg should not be empty");
@@ -137,7 +146,6 @@ public class QrCodeConfig {
 
     /**
      * 构造EncodeHints
-     * todo 这里最好加一下参数校验
      * @return
      */
     public Map<EncodeHintType,Object> buildEncodeHints(){
@@ -149,23 +157,12 @@ public class QrCodeConfig {
         return hints;
     }
 
-    public MatrixToImageConfig buildMatrixToImageConfig(){
-        if(WHITE.equals(bgColor) && BLACK.equals(onColor)){
-            return new MatrixToImageConfig();
-        }
-        return new MatrixToImageConfig(getOnColorIntValue(),getBgColorIntValue());
-    }
-
     public int getBgColorIntValue(){
         return ColorUtil.argbString2Int(this.bgColor);
     }
 
     public int getOnColorIntValue(){
         return ColorUtil.argbString2Int(this.onColor);
-    }
-
-    public boolean isRoundLogoCorner(){
-        return this.logoRadius > RECT_RADIUS;
     }
 
     public static class InternalBuilder extends QrCodeConfigBuilder {

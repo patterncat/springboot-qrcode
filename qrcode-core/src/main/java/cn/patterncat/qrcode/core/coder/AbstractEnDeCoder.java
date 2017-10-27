@@ -3,6 +3,7 @@ package cn.patterncat.qrcode.core.coder;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ImgUtil;
+import cn.patterncat.qrcode.core.util.MatrixUtil;
 import cn.patterncat.qrcode.core.writer.StrictQuietZoneWriter;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
@@ -77,10 +78,8 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         int qrCodeWidth = bitMatrix.getWidth();
         int qrCodeHeight = bitMatrix.getHeight();
 
-        MatrixToImageConfig matrixConfig = config.buildMatrixToImageConfig();
         //绘制qrcode的前景色及背景色
-        BufferedImage qrCodeImg = drawQrCode(bitMatrix,matrixConfig);
-
+        BufferedImage qrCodeImg = drawQrCode(bitMatrix,config);
 
         //判断图片大小与设置的是否一致,不一致则缩放
         int neededWidth = config.getSize();
@@ -93,8 +92,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
             qrCodeImg = tmp;
         }
 
-        String logoLocation = config.getLogo();
-        if(logoLocation != null && logoLocation.length() > 0){
+        if(config.hasLogo()){
             //添加logo
             drawLogo(qrCodeImg,config);
         }
@@ -103,21 +101,33 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         return qrCodeImg;
     }
 
-    protected BufferedImage drawQrCode(BitMatrix bitMatrix,MatrixToImageConfig matrixConfig){
-        return MatrixToImageWriter.toBufferedImage(bitMatrix,matrixConfig);
+    /**
+     * 修改MatrixToImageWriter.toBufferedImage(BitMatrix matrix, MatrixToImageConfig config)方法
+     * @param bitMatrix
+     * @param config
+     * @return
+     */
+    protected BufferedImage drawQrCode(BitMatrix bitMatrix,QrCodeConfig config){
+        int onColor = config.getOnColorIntValue();
+        int offColor = config.getBgColorIntValue();
+        //如果有logo的话,则在可以使用binary的情况下,不使用binary,不然logo会变成黑色
+        boolean useBinaryIfMatch = config.hasLogo() ? false : true;
+        int colorModel = MatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
+        return MatrixUtil.toBufferedImage(bitMatrix,onColor,offColor,colorModel);
     }
 
     protected void drawLogo(BufferedImage qrCode,QrCodeConfig config) throws IOException {
         BufferedImage logoImg = ImgUtil.fromPathOrUrl(config.getLogo());
+        int roundRadius = calLogoRadius(logoImg,config);
         //是否圆角
-        if(config.isRoundLogoCorner()){
-            logoImg = ImgUtil.roundImageCorner(logoImg,config.getLogoRadius());
+        if(config.isLogoRoundCorner()){
+            logoImg = ImgUtil.roundImageCorner(logoImg,roundRadius);
         }
         //是否边框
         if(config.isLogoBorder()){
             Color logoBorderColor = ColorUtil.argb2Color(config.getLogoBorderColor());
             int borderSize = calLogoBorderSize(logoImg,config);
-            logoImg = ImgUtil.addRoundedBorder(logoImg,calLogoRadius(logoImg,config),borderSize,logoBorderColor);
+            logoImg = ImgUtil.addRoundedBorder(logoImg,roundRadius,borderSize,logoBorderColor);
         }
         ImgUtil.coverImage(logoImg,qrCode,config.getLogoSizeRatio(),config.getLogoSizeRatio());
     }
@@ -131,13 +141,12 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
     }
 
     protected int calLogoRadius(BufferedImage logoImg,QrCodeConfig config){
-        if(!config.isRoundLogoCorner()){
+        if(!config.isLogoRoundCorner()){
             return QrCodeConfig.RECT_RADIUS;
         }
-        //如果没有设置,则自动计算
+        //如果没有设置,则按默认
         if(QrCodeConfig.RECT_RADIUS == config.getLogoRadius()){
-            //默认取logo长度的1/4
-            return logoImg.getWidth() / 4;
+            return QrCodeConfig.ROUND_RADIUS;
         }
         return config.getLogoRadius();
     }
