@@ -4,11 +4,15 @@ import cn.patterncat.qrcode.core.bean.ImageType;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.coder.DefaultEnDeCoder;
 import cn.patterncat.qrcode.core.coder.QrCodeEnDeCoder;
+import com.google.zxing.ChecksumException;
+import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Base64;
 
 /**
  * Created by patterncat on 2017-10-27.
@@ -54,5 +58,17 @@ public class QrCodeTest {
                 .errorCorrectionLevel(ErrorCorrectionLevel.H)
                 .build();
         enDeCoder.encodeAsFile(config,"testWithLogo.jpg");
+    }
+
+    @Test
+    public void testAsString() throws IOException, WriterException, FormatException, ChecksumException, NotFoundException {
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg("hello world")
+                .build();
+        String base64 = enDeCoder.encodeAsBase64(config);
+        System.out.println(base64);
+
+        System.out.println(enDeCoder.decodeFromBase64(base64));
+
     }
 }

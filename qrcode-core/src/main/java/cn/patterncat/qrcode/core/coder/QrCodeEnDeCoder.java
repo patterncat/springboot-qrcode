@@ -18,7 +18,7 @@ public interface QrCodeEnDeCoder {
 
     public BufferedImage encodeAsBufferedImage(QrCodeConfig config) throws WriterException, IOException;
 
-    public String encodeAsString(QrCodeConfig config) throws IOException, WriterException;
+    public String encodeAsBase64(QrCodeConfig config) throws IOException, WriterException;
 
     public void write(QrCodeConfig config, OutputStream outputStream) throws IOException, WriterException;
 
@@ -26,5 +26,7 @@ public interface QrCodeEnDeCoder {
 
     public String decode(BufferedImage image) throws FormatException, ChecksumException, NotFoundException;
 
-    public String decode(String imgPath) throws IOException, FormatException, ChecksumException, NotFoundException;
+    public String decodeFromPath(String imgPath) throws IOException, FormatException, ChecksumException, NotFoundException;
+
+    public String decodeFromBase64(String base64Img) throws IOException, FormatException, ChecksumException, NotFoundException;
 }
