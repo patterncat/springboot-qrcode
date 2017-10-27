@@ -1,4 +1,4 @@
-package cn.patterncat.qrcode;
+package cn.patterncat.qrcode.core;
 
 import org.junit.Test;
 

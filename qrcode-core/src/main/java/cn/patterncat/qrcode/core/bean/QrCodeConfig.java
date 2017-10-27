@@ -1,7 +1,9 @@
 package cn.patterncat.qrcode.core.bean;
 
 import cn.patterncat.qrcode.core.util.ColorUtil;
+import cn.patterncat.qrcode.core.util.ValidationUtil;
 import com.google.zxing.EncodeHintType;
+import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -55,6 +57,12 @@ public class QrCodeConfig {
     private int padding = DEFAULT_IMG_PADDING;
 
     /**
+     * 如果这里是true的话,则严格保证最后生成的padding大小跟设置的一样
+     */
+    @Builder.Default
+    private boolean paddingStrict = false;
+
+    /**
      * qrcode的背景色,16进制argb格式,比如0xFFFFFFFF,默认为白色
      */
     @Builder.Default
@@ -69,7 +77,8 @@ public class QrCodeConfig {
     /**
      * 生成图片类型jpg或png
      */
-    private ImageType imageType;
+    @Builder.Default
+    private ImageType imageType = ImageType.png;
 
     /**
      * 二维码纠错级别,默认high
@@ -103,13 +112,27 @@ public class QrCodeConfig {
     private boolean logoBorder = true;
 
     /**
+     * 默认为logo宽度的1/10
+     */
+    @Builder.Default
+    private int logoBroderSizeRatio = 10;
+
+    /**
      * logo边框的颜色,默认是白色
      */
     @Builder.Default
     private String logoBorderColor = WHITE;
 
-    public void validParams(){
-        //// TODO: 2017/10/26 校验参数
+    public void validateParams(){
+        ValidationUtil.checkNotBlank(msg,"msg should not be empty");
+        ValidationUtil.checkExpressionTrue(size > 0,"size should > 0");
+        ValidationUtil.checkExpressionTrue(padding >= 0 && padding < size,"padding should >= 0 and < size");
+        ValidationUtil.checkExpressionTrue(logoSizeRatio > 0,"logoSizeRatio should > 0");
+        ValidationUtil.checkExpressionTrue(logoBroderSizeRatio > 0,"logoBroderSizeRatio should > 0");
+        ValidationUtil.checkExpressionTrue(logoRadius > -1,"logoRadius should > -1");
+        ValidationUtil.checkExpressionTrue(imageType != null,"imageType should not be null");
+        ValidationUtil.checkExpressionTrue(errorCorrectionLevel != null,"errorCorrectionLevel should not be null");
+        //validate color
     }
 
     /**
@@ -126,6 +149,13 @@ public class QrCodeConfig {
         return hints;
     }
 
+    public MatrixToImageConfig buildMatrixToImageConfig(){
+        if(WHITE.equals(bgColor) && BLACK.equals(onColor)){
+            return new MatrixToImageConfig();
+        }
+        return new MatrixToImageConfig(getOnColorIntValue(),getBgColorIntValue());
+    }
+
     public int getBgColorIntValue(){
         return ColorUtil.argbString2Int(this.bgColor);
     }
@@ -136,6 +166,22 @@ public class QrCodeConfig {
 
     public boolean isRoundLogoCorner(){
         return this.logoRadius > RECT_RADIUS;
+    }
+
+    public static class InternalBuilder extends QrCodeConfigBuilder {
+        InternalBuilder() {
+            super();
+        }
+        @Override
+        public QrCodeConfig build() {
+            QrCodeConfig config = super.build();
+            config.validateParams();
+            return config;
+        }
+    }
+
+    public static QrCodeConfigBuilder builder() {
+        return new InternalBuilder();
     }
 
 }

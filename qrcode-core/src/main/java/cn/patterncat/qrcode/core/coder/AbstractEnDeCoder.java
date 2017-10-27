@@ -3,6 +3,7 @@ package cn.patterncat.qrcode.core.coder;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ImgUtil;
+import cn.patterncat.qrcode.core.writer.StrictQuietZoneWriter;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
@@ -12,9 +13,11 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +31,9 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         put(DecodeHintType.CHARACTER_SET, StandardCharsets.UTF_8.name());
     }};
 
-    QRCodeWriter writer = new QRCodeWriter();
+    Writer defaultWriter = new QRCodeWriter();
+
+    Writer strictQuietZoneWriter = new StrictQuietZoneWriter();
 
     @Override
     public BufferedImage encodeAsBufferedImage(QrCodeConfig config) throws WriterException, IOException {
@@ -45,9 +50,20 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         return result.getText();
     }
 
+    @Override
+    public void write(QrCodeConfig config, OutputStream outputStream) throws IOException, WriterException {
+        BufferedImage bufferedImage = encodeAsBufferedImage(config);
+        if (!ImageIO.write(bufferedImage,config.getImageType().name(), outputStream)) {
+            throw new IOException("Could not write an image of format " + config.getImageType().name());
+        }
+    }
+
     protected BitMatrix encodeRawMsg(QrCodeConfig config) throws WriterException {
 //        QRCode code = Encoder.encode(config.getMsg(), config.getErrorCorrectionLevel(),config.buildEncodeHints());
-        return writer.encode(config.getMsg(), BarcodeFormat.QR_CODE,config.getSize(),config.getSize());
+        if(config.isPaddingStrict()){
+            return strictQuietZoneWriter.encode(config.getMsg(), BarcodeFormat.QR_CODE,config.getSize(),config.getSize(),config.buildEncodeHints());
+        }
+        return defaultWriter.encode(config.getMsg(), BarcodeFormat.QR_CODE,config.getSize(),config.getSize(),config.buildEncodeHints());
     }
 
     /**
@@ -61,7 +77,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         int qrCodeWidth = bitMatrix.getWidth();
         int qrCodeHeight = bitMatrix.getHeight();
 
-        MatrixToImageConfig matrixConfig = new MatrixToImageConfig(config.getOnColorIntValue(),config.getBgColorIntValue());
+        MatrixToImageConfig matrixConfig = config.buildMatrixToImageConfig();
         //绘制qrcode的前景色及背景色
         BufferedImage qrCodeImg = drawQrCode(bitMatrix,matrixConfig);
 
@@ -100,7 +116,8 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         //是否边框
         if(config.isLogoBorder()){
             Color logoBorderColor = ColorUtil.argb2Color(config.getLogoBorderColor());
-            logoImg = ImgUtil.addRoundedBorder(logoImg,config.getLogoRadius(),calLogoBorderSize(),logoBorderColor);
+            int borderSize = calLogoBorderSize(logoImg,config);
+            logoImg = ImgUtil.addRoundedBorder(logoImg,calLogoRadius(logoImg,config),borderSize,logoBorderColor);
         }
         ImgUtil.coverImage(logoImg,qrCode,config.getLogoSizeRatio(),config.getLogoSizeRatio());
     }
@@ -109,7 +126,19 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
      * 计算logo的边框粗细
      * @return
      */
-    protected int calLogoBorderSize(){
-        return 1;
+    protected int calLogoBorderSize(BufferedImage logoImg,QrCodeConfig config){
+        return logoImg.getWidth() / config.getLogoBroderSizeRatio();
+    }
+
+    protected int calLogoRadius(BufferedImage logoImg,QrCodeConfig config){
+        if(!config.isRoundLogoCorner()){
+            return QrCodeConfig.RECT_RADIUS;
+        }
+        //如果没有设置,则自动计算
+        if(QrCodeConfig.RECT_RADIUS == config.getLogoRadius()){
+            //默认取logo长度的1/4
+            return logoImg.getWidth() / 4;
+        }
+        return config.getLogoRadius();
     }
 }

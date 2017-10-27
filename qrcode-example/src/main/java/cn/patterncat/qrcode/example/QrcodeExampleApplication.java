@@ -1,4 +1,4 @@
-package cn.patterncat.qrcodeexample;
+package cn.patterncat.qrcode.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

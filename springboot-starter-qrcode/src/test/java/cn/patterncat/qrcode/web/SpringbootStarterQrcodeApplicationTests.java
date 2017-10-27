@@ -1,4 +1,4 @@
-package cn.patterncat.springbootstarterqrcode;
+package cn.patterncat.qrcode.web;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

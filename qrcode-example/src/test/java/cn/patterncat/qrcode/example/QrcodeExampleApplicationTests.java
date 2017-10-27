@@ -1,4 +1,4 @@
-package cn.patterncat.qrcodeexample;
+package cn.patterncat.qrcode.example;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

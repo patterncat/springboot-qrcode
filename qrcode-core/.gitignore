@@ -22,3 +22,11 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+## pic
+.jpg
+.jpeg
+.png
+
+## mac
+.DS_Store
