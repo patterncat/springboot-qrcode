@@ -20,19 +20,22 @@ import java.io.IOException;
  * Created by patterncat on 2017-10-27.
  */
 @Controller
-@RequestMapping("/qr")
+@RequestMapping("/qrcode")
 public class QrCodeController {
 
     QrCodeEnDeCoder enDeCoder = new DefaultEnDeCoder();
 
     @RequestMapping(value = "",method = RequestMethod.GET)
-    public void generate(@RequestParam String content, HttpServletResponse response) throws IOException, WriterException {
+    public void generate(@RequestParam String content,
+                         @RequestParam(required = false) Integer size,
+                         @RequestParam(required = false) String logoUrl,
+                         HttpServletResponse response) throws IOException, WriterException {
         response.setContentType("image/png");
         response.setHeader("Content-Disposition","inline");
         QrCodeConfig config = QrCodeConfig.builder().msg(content)
-                .size(300)
-                .padding(5)
-                .imageType(ImageType.jpg)
+                .size(size == null ? 300 : size)
+                .logo(logoUrl)
+                .imageType(ImageType.png)
                 .errorCorrectionLevel(ErrorCorrectionLevel.H)
                 .build();
         enDeCoder.write(config,response.getOutputStream());

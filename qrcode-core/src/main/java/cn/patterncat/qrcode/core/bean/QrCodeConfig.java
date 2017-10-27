@@ -3,7 +3,6 @@ package cn.patterncat.qrcode.core.bean;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ValidationUtil;
 import com.google.zxing.EncodeHintType;
-import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -142,6 +141,13 @@ public class QrCodeConfig {
         ValidationUtil.checkExpressionTrue(imageType != null,"imageType should not be null");
         ValidationUtil.checkExpressionTrue(errorCorrectionLevel != null,"errorCorrectionLevel should not be null");
         //validate color
+        try{
+            getBgColorIntValue();
+            getOnColorIntValue();
+            getLogoBorderColor();
+        }catch (Exception e){
+            throw new IllegalArgumentException("illegal color string",e);
+        }
     }
 
     /**

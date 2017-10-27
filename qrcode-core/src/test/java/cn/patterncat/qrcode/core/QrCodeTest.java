@@ -12,7 +12,6 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Base64;
 
 /**
  * Created by patterncat on 2017-10-27.
