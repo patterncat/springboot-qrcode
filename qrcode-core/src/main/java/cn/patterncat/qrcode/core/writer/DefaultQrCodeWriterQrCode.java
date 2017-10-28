@@ -1,12 +1,11 @@
 package cn.patterncat.qrcode.core.writer;
 
-import cn.patterncat.qrcode.core.bean.BitMatrixWrapper;
+import cn.patterncat.qrcode.core.bean.BitMatrixInfo;
 import cn.patterncat.qrcode.core.bean.DetectInfo;
 import cn.patterncat.qrcode.core.bean.InOutType;
 import cn.patterncat.qrcode.core.util.BitMatrixUtil;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
-import com.google.zxing.Writer;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
@@ -23,23 +22,23 @@ import java.util.Optional;
  * zxing版本升级的时候,注意下这个类的改动
  * Created by patterncat on 2017-10-27.
  */
-public class DefaultQrCodeWriter implements MatrixWriter {
+public class DefaultQrCodeWriterQrCode implements QrCodeMatrixWriter {
 
     public static final int QUIET_ZONE_SIZE = 4;
 
     @Override
-    public BitMatrixWrapper encode(String contents, BarcodeFormat format, int width, int height)
+    public BitMatrixInfo encode(String contents, BarcodeFormat format, int width, int height)
             throws WriterException {
 
         return encode(contents, format, width, height, null);
     }
 
     @Override
-    public BitMatrixWrapper encode(String contents,
-                            BarcodeFormat format,
-                            int width,
-                            int height,
-                            Map<EncodeHintType, ?> hints) throws WriterException {
+    public BitMatrixInfo encode(String contents,
+                                BarcodeFormat format,
+                                int width,
+                                int height,
+                                Map<EncodeHintType, ?> hints) throws WriterException {
 
         if (contents.isEmpty()) {
             throw new IllegalArgumentException("Found empty contents");
@@ -71,7 +70,7 @@ public class DefaultQrCodeWriter implements MatrixWriter {
 
     // Note that the input matrix uses 0 == white, 1 == black, while the output matrix uses
     // 0 == black, 255 == white (i.e. an 8 bit greyscale bitmap).
-    public BitMatrixWrapper renderResult(QRCode code, int width, int height, int quietZone) {
+    public BitMatrixInfo renderResult(QRCode code, int width, int height, int quietZone) {
         ByteMatrix input = code.getMatrix();
         if (input == null) {
             throw new IllegalStateException();
@@ -91,15 +90,27 @@ public class DefaultQrCodeWriter implements MatrixWriter {
         int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
         int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-        BitMatrixWrapper wrapper = scaleUpQrCodeToOutputBitMatrix(input,inputWidth,inputHeight,
+        BitMatrixInfo wrapper = scaleUpQrCodeToOutputBitMatrix(input,inputWidth,inputHeight,
                 outputWidth,outputHeight,multiple,
                 topPadding,leftPadding);
         return wrapper;
     }
 
-    protected BitMatrixWrapper scaleUpQrCodeToOutputBitMatrix(ByteMatrix input,int inputWidth,int inputHeight,
-                                                              int outputWidth,int outputHeight,int multiple,
-                                                              int topPadding,int leftPadding){
+    /**
+     * 按比例将原始qrcode的version对应的尺寸伸缩到指定的宽高
+     * @param input
+     * @param inputWidth
+     * @param inputHeight
+     * @param outputWidth
+     * @param outputHeight
+     * @param multiple
+     * @param topPadding
+     * @param leftPadding
+     * @return
+     */
+    protected BitMatrixInfo scaleUpQrCodeToOutputBitMatrix(ByteMatrix input, int inputWidth, int inputHeight,
+                                                           int outputWidth, int outputHeight, int multiple,
+                                                           int topPadding, int leftPadding){
         BitMatrix output = new BitMatrix(outputWidth, outputHeight);
         //这样做省得去copy BitMatrix再做扩展,就是多了一点点内存开销
         BitMatrix detectIn = new BitMatrix(outputWidth,outputHeight);
@@ -110,6 +121,7 @@ public class DefaultQrCodeWriter implements MatrixWriter {
             for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
                 if (input.get(inputX, inputY) == 1) {
                     output.setRegion(outputX, outputY, multiple, multiple);
+                    //判断detect position,然后记录到bit matrix
                     Optional<DetectInfo> optional = BitMatrixUtil.isDectectPosition(input,inputX,inputY);
                     if(optional.isPresent()){
                         DetectInfo detectInfo = optional.get();
@@ -123,7 +135,7 @@ public class DefaultQrCodeWriter implements MatrixWriter {
             }
         }
 
-        return BitMatrixWrapper.builder()
+        return BitMatrixInfo.builder()
                 .bitMatrix(output)
                 .detectInMatrix(detectIn)
                 .detectOutMatrix(detectOut)

@@ -1,13 +1,12 @@
 package cn.patterncat.qrcode.core.util;
 
-import cn.patterncat.qrcode.core.bean.BitMatrixWrapper;
+import cn.patterncat.qrcode.core.bean.BitMatrixInfo;
 import cn.patterncat.qrcode.core.bean.DetectInfo;
 import cn.patterncat.qrcode.core.bean.DetectPositionType;
 import cn.patterncat.qrcode.core.bean.InOutType;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
-import com.google.zxing.qrcode.encoder.QRCode;
 
 import java.awt.image.BufferedImage;
 import java.util.Optional;
@@ -24,18 +23,18 @@ public class BitMatrixUtil {
 
     /**
      * 主要将原来的getBufferedImageColorModel改为从参数传入进去
-     * @param matrixWrapper
+     * @param bitMatrixInfo
      * @param onColor
      * @param offColor
      * @param colorModel
      * @return
      */
-    public static BufferedImage toBufferedImage(BitMatrixWrapper matrixWrapper, int onColor, int offColor,
+    public static BufferedImage toBufferedImage(BitMatrixInfo bitMatrixInfo, int onColor, int offColor,
                                                 int detectOutColor, int detectInColor,
                                                 int colorModel) {
-        BitMatrix matrix = matrixWrapper.getBitMatrix();
-        BitMatrix detectOut = matrixWrapper.getDetectOutMatrix();
-        BitMatrix detectIn = matrixWrapper.getDetectInMatrix();
+        BitMatrix matrix = bitMatrixInfo.getBitMatrix();
+        BitMatrix detectOut = bitMatrixInfo.getDetectOutMatrix();
+        BitMatrix detectIn = bitMatrixInfo.getDetectInMatrix();
 
         int width = matrix.getWidth();
         int height = matrix.getHeight();
@@ -91,6 +90,7 @@ public class BitMatrixUtil {
      *   1 0 1 1 1 0 1
      *   1 0 0 0 0 0 1
      *   1 1 1 1 1 1 1
+     * 如果不获取方位,则这个方法可以简写一下,合并if条件
      * @param byteMatrix
      * @param x
      * @param y

@@ -1,13 +1,13 @@
 package cn.patterncat.qrcode.core.coder;
 
-import cn.patterncat.qrcode.core.bean.BitMatrixWrapper;
+import cn.patterncat.qrcode.core.bean.BitMatrixInfo;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ImgUtil;
 import cn.patterncat.qrcode.core.util.BitMatrixUtil;
-import cn.patterncat.qrcode.core.writer.DefaultQrCodeWriter;
-import cn.patterncat.qrcode.core.writer.MatrixWriter;
-import cn.patterncat.qrcode.core.writer.StrictQuietZoneWriter;
+import cn.patterncat.qrcode.core.writer.DefaultQrCodeWriterQrCode;
+import cn.patterncat.qrcode.core.writer.QrCodeMatrixWriter;
+import cn.patterncat.qrcode.core.writer.StrictQuietZoneWriterQrCode;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
@@ -29,18 +29,18 @@ import java.util.Map;
  */
 public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
 
-    public static final Map<DecodeHintType, Object> decodeHints = new HashMap<DecodeHintType, Object>(){{
+    public static final Map<DecodeHintType, Object> DECODE_HINTS = new HashMap<DecodeHintType, Object>(){{
         put(DecodeHintType.CHARACTER_SET, StandardCharsets.UTF_8.name());
     }};
 
-    MatrixWriter defaultWriter = new DefaultQrCodeWriter();
+    QrCodeMatrixWriter defaultWriter = new DefaultQrCodeWriterQrCode();
 
-    MatrixWriter strictQuietZoneWriter = new StrictQuietZoneWriter();
+    QrCodeMatrixWriter strictQuietZoneWriter = new StrictQuietZoneWriterQrCode();
 
     @Override
     public BufferedImage encodeAsBufferedImage(QrCodeConfig config) throws WriterException, IOException {
-        BitMatrixWrapper result = encodeMsgToMatrix(config);
-        return decorate(config,result);
+        BitMatrixInfo bitMatrixInfo = encodeMsgToMatrix(config);
+        return decorate(config,bitMatrixInfo);
     }
 
     @Override
@@ -48,7 +48,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         LuminanceSource source = new BufferedImageLuminanceSource(image);
         BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
         QRCodeReader qrCodeReader = new QRCodeReader();
-        Result result = qrCodeReader.decode(bitmap,decodeHints);
+        Result result = qrCodeReader.decode(bitmap,DECODE_HINTS);
         return result.getText();
     }
 
@@ -60,7 +60,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         }
     }
 
-    protected BitMatrixWrapper encodeMsgToMatrix(QrCodeConfig config) throws WriterException {
+    protected BitMatrixInfo encodeMsgToMatrix(QrCodeConfig config) throws WriterException {
 //        QRCode qrCode = Encoder.encode(config.getMsg(), config.getErrorCorrectionLevel(),config.buildEncodeHints());
         if(config.isPaddingStrict()){
 //            bitMatrix = strictQuietZoneWriter.renderResult(qrCode,config.getSize(),config.getSize(),config.getPadding());
@@ -73,16 +73,16 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
      * 根据config的配置来装饰原始的二维码信息
      * 比如设置圆角\添加logo等
      * @param config
-     * @param bitMatrixWrapper
+     * @param bitMatrixInfo
      * @return
      */
-    protected BufferedImage decorate(QrCodeConfig config,BitMatrixWrapper bitMatrixWrapper) throws IOException {
-        BitMatrix bitMatrix = bitMatrixWrapper.getBitMatrix();
+    protected BufferedImage decorate(QrCodeConfig config,BitMatrixInfo bitMatrixInfo) throws IOException {
+        BitMatrix bitMatrix = bitMatrixInfo.getBitMatrix();
         int qrCodeWidth = bitMatrix.getWidth();
         int qrCodeHeight = bitMatrix.getHeight();
 
         //绘制qrcode的前景色及背景色
-        BufferedImage qrCodeImg = drawQrCode(bitMatrixWrapper,config);
+        BufferedImage qrCodeImg = drawQrCode(bitMatrixInfo,config);
 
         //判断图片大小与设置的是否一致,不一致则缩放
         int neededWidth = config.getSize();
@@ -106,11 +106,11 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
 
     /**
      * 修改MatrixToImageWriter.toBufferedImage(BitMatrix matrix, MatrixToImageConfig config)方法
-     * @param matrixWrapper
+     * @param bitMatrixInfo
      * @param config
      * @return
      */
-    protected BufferedImage drawQrCode(BitMatrixWrapper matrixWrapper,QrCodeConfig config){
+    protected BufferedImage drawQrCode(BitMatrixInfo bitMatrixInfo, QrCodeConfig config){
         int onColor = config.getOnColorIntValue();
         int offColor = config.getOffColorIntValue();
         //如果有logo的话,则在可以使用binary的情况下,不使用binary,不然logo会变成黑色
@@ -121,7 +121,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
             useBinaryIfMatch = false;
         }
         int colorModel = BitMatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
-        return BitMatrixUtil.toBufferedImage(matrixWrapper,onColor,offColor,
+        return BitMatrixUtil.toBufferedImage(bitMatrixInfo,onColor,offColor,
                 config.getDetectOutColorIntValue(),config.getDetectInColorIntValue(),
                 colorModel);
     }

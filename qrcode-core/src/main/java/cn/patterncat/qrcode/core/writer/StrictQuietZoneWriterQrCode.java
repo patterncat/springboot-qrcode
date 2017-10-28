@@ -1,21 +1,16 @@
 package cn.patterncat.qrcode.core.writer;
 
-import cn.patterncat.qrcode.core.bean.BitMatrixWrapper;
-import cn.patterncat.qrcode.core.bean.DetectInfo;
-import cn.patterncat.qrcode.core.util.BitMatrixUtil;
-import com.google.zxing.common.BitMatrix;
+import cn.patterncat.qrcode.core.bean.BitMatrixInfo;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
-
-import java.util.Optional;
 
 /**
  * Created by patterncat on 2017-10-27.
  */
-public class StrictQuietZoneWriter extends DefaultQrCodeWriter{
+public class StrictQuietZoneWriterQrCode extends DefaultQrCodeWriterQrCode {
 
     @Override
-    public BitMatrixWrapper renderResult(QRCode code, int width, int height, int quietZone) {
+    public BitMatrixInfo renderResult(QRCode code, int width, int height, int quietZone) {
         ByteMatrix input = code.getMatrix();
         if (input == null) {
             throw new IllegalStateException();
@@ -42,7 +37,7 @@ public class StrictQuietZoneWriter extends DefaultQrCodeWriter{
         int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
         int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-        BitMatrixWrapper wrapper = scaleUpQrCodeToOutputBitMatrix(input,inputWidth,inputHeight,
+        BitMatrixInfo wrapper = scaleUpQrCodeToOutputBitMatrix(input,inputWidth,inputHeight,
                 outputWidth,outputHeight,multiple,
                 topPadding,leftPadding);
         return wrapper;
