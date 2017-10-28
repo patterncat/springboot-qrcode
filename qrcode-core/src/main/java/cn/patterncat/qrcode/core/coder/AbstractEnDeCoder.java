@@ -1,18 +1,19 @@
 package cn.patterncat.qrcode.core.coder;
 
+import cn.patterncat.qrcode.core.bean.BitMatrixWrapper;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ImgUtil;
-import cn.patterncat.qrcode.core.util.MatrixUtil;
+import cn.patterncat.qrcode.core.util.BitMatrixUtil;
+import cn.patterncat.qrcode.core.writer.DefaultQrCodeWriter;
+import cn.patterncat.qrcode.core.writer.MatrixWriter;
 import cn.patterncat.qrcode.core.writer.StrictQuietZoneWriter;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
-import com.google.zxing.qrcode.QRCodeWriter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -32,14 +33,14 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         put(DecodeHintType.CHARACTER_SET, StandardCharsets.UTF_8.name());
     }};
 
-    Writer defaultWriter = new QRCodeWriter();
+    MatrixWriter defaultWriter = new DefaultQrCodeWriter();
 
-    Writer strictQuietZoneWriter = new StrictQuietZoneWriter();
+    MatrixWriter strictQuietZoneWriter = new StrictQuietZoneWriter();
 
     @Override
     public BufferedImage encodeAsBufferedImage(QrCodeConfig config) throws WriterException, IOException {
-        BitMatrix bitMatrix = encodeRawMsg(config);
-        return decorate(config,bitMatrix);
+        BitMatrixWrapper result = encodeMsgToMatrix(config);
+        return decorate(config,result);
     }
 
     @Override
@@ -59,9 +60,10 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         }
     }
 
-    protected BitMatrix encodeRawMsg(QrCodeConfig config) throws WriterException {
-//        QRCode code = Encoder.encode(config.getMsg(), config.getErrorCorrectionLevel(),config.buildEncodeHints());
+    protected BitMatrixWrapper encodeMsgToMatrix(QrCodeConfig config) throws WriterException {
+//        QRCode qrCode = Encoder.encode(config.getMsg(), config.getErrorCorrectionLevel(),config.buildEncodeHints());
         if(config.isPaddingStrict()){
+//            bitMatrix = strictQuietZoneWriter.renderResult(qrCode,config.getSize(),config.getSize(),config.getPadding());
             return strictQuietZoneWriter.encode(config.getMsg(), BarcodeFormat.QR_CODE,config.getSize(),config.getSize(),config.buildEncodeHints());
         }
         return defaultWriter.encode(config.getMsg(), BarcodeFormat.QR_CODE,config.getSize(),config.getSize(),config.buildEncodeHints());
@@ -71,15 +73,16 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
      * 根据config的配置来装饰原始的二维码信息
      * 比如设置圆角\添加logo等
      * @param config
-     * @param bitMatrix
+     * @param bitMatrixWrapper
      * @return
      */
-    protected BufferedImage decorate(QrCodeConfig config,BitMatrix bitMatrix) throws IOException {
+    protected BufferedImage decorate(QrCodeConfig config,BitMatrixWrapper bitMatrixWrapper) throws IOException {
+        BitMatrix bitMatrix = bitMatrixWrapper.getBitMatrix();
         int qrCodeWidth = bitMatrix.getWidth();
         int qrCodeHeight = bitMatrix.getHeight();
 
         //绘制qrcode的前景色及背景色
-        BufferedImage qrCodeImg = drawQrCode(bitMatrix,config);
+        BufferedImage qrCodeImg = drawQrCode(bitMatrixWrapper,config);
 
         //判断图片大小与设置的是否一致,不一致则缩放
         int neededWidth = config.getSize();
@@ -103,17 +106,24 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
 
     /**
      * 修改MatrixToImageWriter.toBufferedImage(BitMatrix matrix, MatrixToImageConfig config)方法
-     * @param bitMatrix
+     * @param matrixWrapper
      * @param config
      * @return
      */
-    protected BufferedImage drawQrCode(BitMatrix bitMatrix,QrCodeConfig config){
+    protected BufferedImage drawQrCode(BitMatrixWrapper matrixWrapper,QrCodeConfig config){
         int onColor = config.getOnColorIntValue();
-        int offColor = config.getBgColorIntValue();
+        int offColor = config.getOffColorIntValue();
         //如果有logo的话,则在可以使用binary的情况下,不使用binary,不然logo会变成黑色
-        boolean useBinaryIfMatch = config.hasLogo() ? false : true;
-        int colorModel = MatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
-        return MatrixUtil.toBufferedImage(bitMatrix,onColor,offColor,colorModel);
+        boolean useBinaryIfMatch = true;
+        if(config.hasLogo()
+                || config.getDetectInColorIntValue() != MatrixToImageConfig.BLACK
+                || config.getDetectOutColorIntValue() != MatrixToImageConfig.BLACK){
+            useBinaryIfMatch = false;
+        }
+        int colorModel = BitMatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
+        return BitMatrixUtil.toBufferedImage(matrixWrapper,onColor,offColor,
+                config.getDetectOutColorIntValue(),config.getDetectInColorIntValue(),
+                colorModel);
     }
 
     protected void drawLogo(BufferedImage qrCode,QrCodeConfig config) throws IOException {

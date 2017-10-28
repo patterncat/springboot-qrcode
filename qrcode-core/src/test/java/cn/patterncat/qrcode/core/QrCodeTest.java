@@ -28,7 +28,7 @@ public class QrCodeTest {
                 .size(300)
                 .padding(30)
                 .paddingStrict(true)
-                .bgColor("0xffffffff")
+                .offColor("0xffffffff")
                 .onColor("0xffff0000")
                 .imageType(ImageType.jpg)
                 .errorCorrectionLevel(ErrorCorrectionLevel.H)
@@ -43,7 +43,7 @@ public class QrCodeTest {
                 .msg("http://mvnrepository.com/artifact/org.apache.commons/commons-lang3")
                 .size(300)
                 .padding(1)
-//                .bgColor("0xffffffff")
+//                .offColor("0xffffffff")
 //                .onColor("0xffff0000")
 //                .logoRadius(20)
                 .logoRoundCorner(true)
@@ -69,5 +69,15 @@ public class QrCodeTest {
 
         System.out.println(enDeCoder.decodeFromBase64(base64));
 
+    }
+
+    @Test
+    public void testDetectColor() throws IOException, WriterException {
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg("hello world")
+                .detectInColor("0xFFFF6A6A")
+                .detectOutColor("0xFFC0FF3E")
+                .build();
+        enDeCoder.encodeAsFile(config,"out.jpg");
     }
 }

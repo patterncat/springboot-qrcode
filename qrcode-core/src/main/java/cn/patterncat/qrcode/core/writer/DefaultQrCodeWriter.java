@@ -1,5 +1,9 @@
 package cn.patterncat.qrcode.core.writer;
 
+import cn.patterncat.qrcode.core.bean.BitMatrixWrapper;
+import cn.patterncat.qrcode.core.bean.DetectInfo;
+import cn.patterncat.qrcode.core.bean.InOutType;
+import cn.patterncat.qrcode.core.util.BitMatrixUtil;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.Writer;
@@ -11,6 +15,7 @@ import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 从com.google.zxing.qrcode.QRCodeWriter拷贝基本方法过来
@@ -18,19 +23,19 @@ import java.util.Map;
  * zxing版本升级的时候,注意下这个类的改动
  * Created by patterncat on 2017-10-27.
  */
-public class DefaultQrCodeWriter implements Writer {
+public class DefaultQrCodeWriter implements MatrixWriter {
 
     public static final int QUIET_ZONE_SIZE = 4;
 
     @Override
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height)
+    public BitMatrixWrapper encode(String contents, BarcodeFormat format, int width, int height)
             throws WriterException {
 
         return encode(contents, format, width, height, null);
     }
 
     @Override
-    public BitMatrix encode(String contents,
+    public BitMatrixWrapper encode(String contents,
                             BarcodeFormat format,
                             int width,
                             int height,
@@ -66,7 +71,7 @@ public class DefaultQrCodeWriter implements Writer {
 
     // Note that the input matrix uses 0 == white, 1 == black, while the output matrix uses
     // 0 == black, 255 == white (i.e. an 8 bit greyscale bitmap).
-    public BitMatrix renderResult(QRCode code, int width, int height, int quietZone) {
+    public BitMatrixWrapper renderResult(QRCode code, int width, int height, int quietZone) {
         ByteMatrix input = code.getMatrix();
         if (input == null) {
             throw new IllegalStateException();
@@ -86,17 +91,42 @@ public class DefaultQrCodeWriter implements Writer {
         int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
         int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
+        BitMatrixWrapper wrapper = scaleUpQrCodeToOutputBitMatrix(input,inputWidth,inputHeight,
+                outputWidth,outputHeight,multiple,
+                topPadding,leftPadding);
+        return wrapper;
+    }
+
+    protected BitMatrixWrapper scaleUpQrCodeToOutputBitMatrix(ByteMatrix input,int inputWidth,int inputHeight,
+                                                              int outputWidth,int outputHeight,int multiple,
+                                                              int topPadding,int leftPadding){
         BitMatrix output = new BitMatrix(outputWidth, outputHeight);
+        //这样做省得去copy BitMatrix再做扩展,就是多了一点点内存开销
+        BitMatrix detectIn = new BitMatrix(outputWidth,outputHeight);
+        BitMatrix detectOut = new BitMatrix(outputWidth,outputHeight);
 
         for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
             // Write the contents of this row of the barcode
             for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
                 if (input.get(inputX, inputY) == 1) {
                     output.setRegion(outputX, outputY, multiple, multiple);
+                    Optional<DetectInfo> optional = BitMatrixUtil.isDectectPosition(input,inputX,inputY);
+                    if(optional.isPresent()){
+                        DetectInfo detectInfo = optional.get();
+                        if(detectInfo.getInOutType() == InOutType.INNER){
+                            detectIn.setRegion(outputX, outputY, multiple, multiple);
+                        }else{
+                            detectOut.setRegion(outputX, outputY, multiple, multiple);
+                        }
+                    }
                 }
             }
         }
 
-        return output;
+        return BitMatrixWrapper.builder()
+                .bitMatrix(output)
+                .detectInMatrix(detectIn)
+                .detectOutMatrix(detectOut)
+                .build();
     }
 }

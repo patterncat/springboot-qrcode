@@ -67,13 +67,25 @@ public class QrCodeConfig {
      * qrcode的背景色,16进制argb格式,比如0xFFFFFFFF,默认为白色
      */
     @Builder.Default
-    private String bgColor = WHITE;
+    private String offColor = WHITE;
 
     /**
      * qrcode二维码的颜色,16进制argb格式,比如0xFF000000,默认为黑色
      */
     @Builder.Default
     private String onColor = BLACK;
+
+    /**
+     * 三个detect position的外层颜色
+     */
+    @Builder.Default
+    private String detectOutColor = BLACK;
+
+    /**
+     * 三个detect position的内层颜色
+     */
+    @Builder.Default
+    private String detectInColor = BLACK;
 
     /**
      * 生成图片类型jpg或png
@@ -142,9 +154,11 @@ public class QrCodeConfig {
         ValidationUtil.checkExpressionTrue(errorCorrectionLevel != null,"errorCorrectionLevel should not be null");
         //validate color
         try{
-            getBgColorIntValue();
+            getOffColorIntValue();
             getOnColorIntValue();
-            getLogoBorderColor();
+            getDetectInColor();
+            getDetectOutColor();
+            getLogoBorderColorIntValue();
         }catch (Exception e){
             throw new IllegalArgumentException("illegal color string",e);
         }
@@ -163,12 +177,24 @@ public class QrCodeConfig {
         return hints;
     }
 
-    public int getBgColorIntValue(){
-        return ColorUtil.argbString2Int(this.bgColor);
+    public int getOffColorIntValue(){
+        return ColorUtil.argbString2Int(this.offColor);
     }
 
     public int getOnColorIntValue(){
         return ColorUtil.argbString2Int(this.onColor);
+    }
+
+    public int getDetectOutColorIntValue(){
+        return ColorUtil.argbString2Int(this.detectOutColor);
+    }
+
+    public int getDetectInColorIntValue(){
+        return ColorUtil.argbString2Int(this.detectInColor);
+    }
+
+    public int getLogoBorderColorIntValue(){
+        return ColorUtil.argbString2Int(this.logoBorderColor);
     }
 
     public static class InternalBuilder extends QrCodeConfigBuilder {

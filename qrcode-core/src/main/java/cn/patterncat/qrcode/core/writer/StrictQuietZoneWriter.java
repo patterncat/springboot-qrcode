@@ -1,8 +1,13 @@
 package cn.patterncat.qrcode.core.writer;
 
+import cn.patterncat.qrcode.core.bean.BitMatrixWrapper;
+import cn.patterncat.qrcode.core.bean.DetectInfo;
+import cn.patterncat.qrcode.core.util.BitMatrixUtil;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
+
+import java.util.Optional;
 
 /**
  * Created by patterncat on 2017-10-27.
@@ -10,7 +15,7 @@ import com.google.zxing.qrcode.encoder.QRCode;
 public class StrictQuietZoneWriter extends DefaultQrCodeWriter{
 
     @Override
-    public BitMatrix renderResult(QRCode code, int width, int height, int quietZone) {
+    public BitMatrixWrapper renderResult(QRCode code, int width, int height, int quietZone) {
         ByteMatrix input = code.getMatrix();
         if (input == null) {
             throw new IllegalStateException();
@@ -37,17 +42,9 @@ public class StrictQuietZoneWriter extends DefaultQrCodeWriter{
         int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
         int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-        BitMatrix output = new BitMatrix(outputWidth, outputHeight);
-
-        for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
-            // Write the contents of this row of the barcode
-            for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
-                if (input.get(inputX, inputY) == 1) {
-                    output.setRegion(outputX, outputY, multiple, multiple);
-                }
-            }
-        }
-
-        return output;
+        BitMatrixWrapper wrapper = scaleUpQrCodeToOutputBitMatrix(input,inputWidth,inputHeight,
+                outputWidth,outputHeight,multiple,
+                topPadding,leftPadding);
+        return wrapper;
     }
 }
