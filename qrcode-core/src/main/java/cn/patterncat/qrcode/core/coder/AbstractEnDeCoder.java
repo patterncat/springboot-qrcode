@@ -95,11 +95,15 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
             qrCodeImg = tmp;
         }
 
-        if(config.hasLogo()){
-            //添加logo
-            drawLogo(qrCodeImg,config);
+        if(config.hasBgImage()){
+            //设置整个图片的背景
+            qrCodeImg = coverQrCodeToBgImage(qrCodeImg,config);
         }
 
+        if(config.hasLogo()){
+            //添加logo
+            drawLogoOnQrCode(qrCodeImg,config);
+        }
 
         return qrCodeImg;
     }
@@ -114,19 +118,20 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         int onColor = config.getOnColorIntValue();
         int offColor = config.getOffColorIntValue();
         //如果有logo的话,则在可以使用binary的情况下,不使用binary,不然logo会变成黑色
-        boolean useBinaryIfMatch = true;
-        if(config.hasLogo()
-                || config.getDetectInColorIntValue() != MatrixToImageConfig.BLACK
-                || config.getDetectOutColorIntValue() != MatrixToImageConfig.BLACK){
-            useBinaryIfMatch = false;
-        }
-        int colorModel = BitMatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
+//        boolean useBinaryIfMatch = true;
+//        if(config.hasLogo()
+//                || config.getDetectInColorIntValue() != MatrixToImageConfig.BLACK
+//                || config.getDetectOutColorIntValue() != MatrixToImageConfig.BLACK){
+//            useBinaryIfMatch = false;
+//        }
+//        int colorModel = BitMatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
+        int colorModel = BufferedImage.TYPE_INT_ARGB;
         return BitMatrixUtil.toColorBufferedImage(bitMatrixInfo,onColor,offColor,
                 config.getDetectOutColorIntValue(),config.getDetectInColorIntValue(),
                 colorModel);
     }
 
-    protected void drawLogo(BufferedImage qrCode,QrCodeConfig config) throws IOException {
+    protected void drawLogoOnQrCode(BufferedImage qrCode,QrCodeConfig config) throws IOException {
         BufferedImage logoImg = ImgUtil.fromPathOrUrl(config.getLogo());
         int roundRadius = calLogoRadius(logoImg,config);
         //是否圆角
@@ -139,7 +144,28 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
             int borderSize = calLogoBorderSize(logoImg,config);
             logoImg = ImgUtil.addRoundedBorder(logoImg,roundRadius,borderSize,logoBorderColor);
         }
-        ImgUtil.coverImage(logoImg,qrCode,config.getLogoSizeRatio(),config.getLogoSizeRatio());
+        ImgUtil.coverImage(logoImg,qrCode,
+                config.getLogoSizeRatio(),config.getLogoSizeRatio(),
+                AlphaComposite.Src); //将logo覆盖过去
+    }
+
+    protected BufferedImage coverQrCodeToBgImage(BufferedImage qrCode,QrCodeConfig config) throws IOException {
+        BufferedImage bgImage = ImgUtil.fromPathOrUrl(config.getBgImage());
+        int width = qrCode.getWidth();
+        int height = qrCode.getHeight();
+        BufferedImage dstImg = bgImage;
+        if (bgImage.getWidth() != width || height != qrCode.getHeight()) {
+            dstImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            dstImg.getGraphics().drawImage(bgImage.getScaledInstance(width, height, Image.SCALE_SMOOTH)
+                    , 0, 0, null);
+        }
+        //将qrcode覆盖到背景图上
+        ImgUtil.coverImage(qrCode,dstImg,1,1,
+                AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,config.getBgImgOpacity()));
+        return dstImg;
+//        ImgUtil.coverImage(bgImage,qrCode,1,1,
+//                AlphaComposite.getInstance(AlphaComposite.DST_ATOP,config.getBgImgOpacity()));
+//        return qrCode;
     }
 
     /**

@@ -14,33 +14,34 @@ import java.net.URL;
 public class ImgUtil {
 
     /**
-     * 将foreImg叠加到bgImg上
-     * 直接修改bgImg
-     * @param foreImg
-     * @param bgImg
+     * 将srcImg叠加到dstImg上
+     * 直接修改dstImg
+     * @param srcImg
+     * @param dstImg
      * @param widthRatio
      * @param heightRatio
      * @return
      * @throws IOException
      */
-    public static void coverImage(BufferedImage foreImg,BufferedImage bgImg,int widthRatio,int heightRatio) throws IOException {
-        int bgImgWidth = bgImg.getWidth();
-        int bgImgHeight = bgImg.getHeight();
+    public static void coverImage(BufferedImage srcImg,BufferedImage dstImg,
+                                  int widthRatio,int heightRatio,
+                                  Composite composite) throws IOException {
+        int dstImgWidth = dstImg.getWidth();
+        int dstImgHeight = dstImg.getHeight();
 
-        int w = bgImgWidth / widthRatio;
-        int h = bgImgHeight / heightRatio;
-        int x = (bgImgWidth - w) / 2;
-        int y = (bgImgHeight - h) / 2;
+        int w = dstImgWidth / widthRatio;
+        int h = dstImgHeight / heightRatio;
+        int x = (dstImgWidth - w) / 2;
+        int y = (dstImgHeight - h) / 2;
 
-        Graphics2D g2 = bgImg.createGraphics();
-        //这里src是foreImg,dst是bgImg
+        Graphics2D g2 = dstImg.createGraphics();
         //这只叠加模式,Src就是覆盖部分只显示src,不显示dst
-        g2.setComposite(AlphaComposite.Src);
+        g2.setComposite(composite);
 //        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1));
-        //将foreImg压缩到w,h大小,然后在bgImg的x,y位置覆盖
-        g2.drawImage(foreImg, x, y, w, h, null);
+        //将srcImg压缩到w,h大小,然后在dstImg的x,y位置叠加
+        g2.drawImage(srcImg, x, y, w, h, null);
         g2.dispose();
-        foreImg.flush();
+        dstImg.flush();
     }
 
     /**

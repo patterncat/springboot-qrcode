@@ -87,4 +87,22 @@ public class QrCodeTest {
                 .build();
         enDeCoder.encodeAsFile(config,"out.jpg");
     }
+
+    @Test
+    public void testBgImg() throws IOException, WriterException {
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg("http://mvnrepository.com/artifact/org.apache.commons/commons-lang3")
+                .size(300)
+                .bgImage("https://b-ssl.duitang.com/uploads/item/201406/05/20140605221928_s2Gyx.jpeg")
+                .onColor("0xff0000ff")
+                .offColor("0xffffffff")
+                .detectInColor("0xffff0000")
+                .detectOutColor("0xff00FF00")
+                .logoRoundCorner(true)
+                .logoBorder(true)
+                .logoBorderColor("0xffff0000")
+                .logo("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
+                .build();
+        enDeCoder.encodeAsFile(config,"out.jpg");
+    }
 }

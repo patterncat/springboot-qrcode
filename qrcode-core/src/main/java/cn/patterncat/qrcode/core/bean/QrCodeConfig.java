@@ -76,6 +76,17 @@ public class QrCodeConfig {
     private String onColor = BLACK;
 
     /**
+     * 背景图片
+     */
+    private String bgImage;
+
+    /**
+     * 不透明程度
+     */
+    @Builder.Default
+    private float bgImgOpacity = 0.8f;
+
+    /**
      * 三个detect position的外层颜色
      */
     @Builder.Default
@@ -141,6 +152,10 @@ public class QrCodeConfig {
 
     public boolean hasLogo(){
         return StringUtils.isNotBlank(logo);
+    }
+
+    public boolean hasBgImage(){
+        return StringUtils.isNotBlank(bgImage);
     }
 
     public void validateParams(){
