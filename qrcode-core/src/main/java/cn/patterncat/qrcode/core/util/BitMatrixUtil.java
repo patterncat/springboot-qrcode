@@ -23,13 +23,14 @@ public class BitMatrixUtil {
 
     /**
      * 主要将原来的getBufferedImageColorModel改为从参数传入进去
+     * 这里实现了二维码的着色
      * @param bitMatrixInfo
      * @param onColor
      * @param offColor
      * @param colorModel
      * @return
      */
-    public static BufferedImage toBufferedImage(BitMatrixInfo bitMatrixInfo, int onColor, int offColor,
+    public static BufferedImage toColorBufferedImage(BitMatrixInfo bitMatrixInfo, int onColor, int offColor,
                                                 int detectOutColor, int detectInColor,
                                                 int colorModel) {
         BitMatrix matrix = bitMatrixInfo.getBitMatrix();
@@ -44,11 +45,13 @@ public class BitMatrixUtil {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int targetOnColor = onColor;
+                //进行detect位置的颜色设置
                 if(detectIn.get(x,y)){
                     targetOnColor = detectInColor;
                 }else if(detectOut.get(x,y)){
                     targetOnColor = detectOutColor;
                 }
+                //二维码颜色设置
                 pixels[index++] = matrix.get(x, y) ? targetOnColor : offColor;
             }
         }

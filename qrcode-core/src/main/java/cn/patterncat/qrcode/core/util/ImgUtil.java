@@ -33,8 +33,10 @@ public class ImgUtil {
         int y = (bgImgHeight - h) / 2;
 
         Graphics2D g2 = bgImg.createGraphics();
-        // 设置为不透明
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1));
+        //这里src是foreImg,dst是bgImg
+        //这只叠加模式,Src就是覆盖部分只显示src,不显示dst
+        g2.setComposite(AlphaComposite.Src);
+//        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1));
         //将foreImg压缩到w,h大小,然后在bgImg的x,y位置覆盖
         g2.drawImage(foreImg, x, y, w, h, null);
         g2.dispose();

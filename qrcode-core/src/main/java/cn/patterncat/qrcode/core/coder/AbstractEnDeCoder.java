@@ -121,7 +121,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
             useBinaryIfMatch = false;
         }
         int colorModel = BitMatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
-        return BitMatrixUtil.toBufferedImage(bitMatrixInfo,onColor,offColor,
+        return BitMatrixUtil.toColorBufferedImage(bitMatrixInfo,onColor,offColor,
                 config.getDetectOutColorIntValue(),config.getDetectInColorIntValue(),
                 colorModel);
     }

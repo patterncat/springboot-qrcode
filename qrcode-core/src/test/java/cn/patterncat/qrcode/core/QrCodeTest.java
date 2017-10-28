@@ -74,9 +74,16 @@ public class QrCodeTest {
     @Test
     public void testDetectColor() throws IOException, WriterException {
         QrCodeConfig config = QrCodeConfig.builder()
-                .msg("hello world")
+                .msg("http://mvnrepository.com/artifact/org.apache.commons/commons-lang3")
+                .size(400)
+                .onColor("0xFFCD96CD")
+                .offColor("0x2687CEFF")
                 .detectInColor("0xFFFF6A6A")
                 .detectOutColor("0xFFC0FF3E")
+                .logoRoundCorner(true)
+                .logoBorder(true)
+                .logoBorderColor("0xffff0000")
+                .logo("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
                 .build();
         enDeCoder.encodeAsFile(config,"out.jpg");
     }
