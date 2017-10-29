@@ -146,7 +146,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         }
         ImgUtil.coverImage(logoImg,qrCode,
                 config.getLogoSizeRatio(),config.getLogoSizeRatio(),
-                AlphaComposite.Src); //将logo覆盖过去
+                AlphaComposite.SrcAtop); //将logo覆盖过去
     }
 
     protected BufferedImage coverQrCodeToBgImage(BufferedImage qrCode,QrCodeConfig config) throws IOException {
@@ -182,7 +182,8 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         }
         //如果没有设置,则按默认
         if(QrCodeConfig.RECT_RADIUS == config.getLogoRadius()){
-            return QrCodeConfig.ROUND_RADIUS;
+//            return QrCodeConfig.ROUND_RADIUS;
+            return logoImg.getWidth() >> 2; //四分之一
         }
         return config.getLogoRadius();
     }

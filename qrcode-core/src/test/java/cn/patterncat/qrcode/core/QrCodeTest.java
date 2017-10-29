@@ -91,17 +91,22 @@ public class QrCodeTest {
     @Test
     public void testBgImg() throws IOException, WriterException {
         QrCodeConfig config = QrCodeConfig.builder()
-                .msg("http://mvnrepository.com/artifact/org.apache.commons/commons-lang3")
+                .msg("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
                 .size(300)
                 .bgImage("https://b-ssl.duitang.com/uploads/item/201406/05/20140605221928_s2Gyx.jpeg")
                 .onColor("0xff0000ff")
-                .offColor("0xffffffff")
+                .offColor("0x80ffffff")
                 .detectInColor("0xffff0000")
                 .detectOutColor("0xff00FF00")
+                .padding(1)
+                .paddingStrict(true)
+                .logoSizeRatio(3)
                 .logoRoundCorner(true)
-                .logoBorder(true)
+                .logoBorder(false)
+//                .logoRadius(45)
                 .logoBorderColor("0xffff0000")
-                .logo("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
+//                .logo("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
+                .logo("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1509853713&di=681de473c5a9510909cf963a3e716c48&imgtype=jpg&er=1&src=http%3A%2F%2Fm.qqzhi.com%2Fupload%2Fimg_1_2823257972D3596592729_23.jpg")
                 .build();
         enDeCoder.encodeAsFile(config,"out.jpg");
     }
