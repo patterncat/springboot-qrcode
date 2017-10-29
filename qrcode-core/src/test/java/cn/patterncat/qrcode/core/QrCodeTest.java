@@ -6,6 +6,7 @@ import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.bean.QrCodeDataShape;
 import cn.patterncat.qrcode.core.coder.DefaultEnDeCoder;
 import cn.patterncat.qrcode.core.coder.QrCodeEnDeCoder;
+import cn.patterncat.qrcode.core.util.ColorUtil;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
 import com.google.zxing.NotFoundException;
@@ -13,6 +14,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -119,12 +121,65 @@ public class QrCodeTest {
     }
 
     @Test
+    public void testOnColor() throws IOException, WriterException{
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg(msg)
+                .size(400)
+                .padding(5)
+                .onColor(PrettyArgbColors.LIGHT_GREEN_STR)
+                .detectInColor(PrettyArgbColors.LIGHT_GREEN_STR)
+                .detectOutColor(PrettyArgbColors.LIGHT_GREEN_STR)
+                .paddingStrict(true)
+                .logoRoundCorner(true)
+                .logoBroderSizeRatio(30)
+                .logo(bgImg)
+                .build();
+        enDeCoder.encodeAsFile(config,"out.jpg");
+    }
+
+    @Test
+    public void testTransparentOnBgImg() throws IOException, WriterException{
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg(msg)
+                .size(400)
+                .padding(1)
+                .bgImage(bgImg)
+                .offColor(ColorUtil.argbHex(Color.WHITE,1F))
+                .onColor(PrettyArgbColors.TRANSPARENT_STR)
+//                .detectInColor(PrettyArgbColors.LIGHT_GREEN_STR)
+//                .detectOutColor(PrettyArgbColors.LIGHT_GREEN_STR)
+                .paddingStrict(true)
+                .logoRoundCorner(true)
+                .logoBroderSizeRatio(30)
+                .logo(bgImg)
+                .build();
+        enDeCoder.encodeAsFile(config,"out.jpg");
+    }
+
+    @Test
+    public void testOnColorAndBgImg() throws IOException, WriterException{
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg(msg)
+                .size(300)
+                .bgImage(bgImg)
+                .onColor(PrettyArgbColors.LIGHT_BLUE_STR)
+                .detectInColor(PrettyArgbColors.LIGHT_BLUE_STR)
+                .detectOutColor(PrettyArgbColors.LIGHT_BLUE_STR)
+                .padding(1)
+                .paddingStrict(true)
+                .build();
+        enDeCoder.encodeAsFile(config,"out.jpg");
+    }
+
+    @Test
     public void testPrettyColorQrCode() throws IOException, WriterException {
         QrCodeConfig config = QrCodeConfig.builder()
                 .msg(msg)
                 .size(400)
-                .detectInColor(PrettyArgbColors.LIGHT_RED_STR)
-                .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
+//                .detectInColor(PrettyArgbColors.LIGHT_RED_STR)
+//                .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
+                .detectInColor(PrettyArgbColors.LIGHT_GREEN_STR)
+                .detectOutColor(PrettyArgbColors.LIGHT_GREEN_STR)
                 .padding(5)
                 .paddingStrict(true)
                 .logoRoundCorner(true)

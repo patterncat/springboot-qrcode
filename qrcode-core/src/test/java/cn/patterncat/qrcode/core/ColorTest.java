@@ -55,6 +55,7 @@ public class ColorTest {
         System.out.println(Color.ORANGE.getRGB());
         System.out.println("0x"+Integer.toHexString(Color.ORANGE.getRGB()));
         System.out.println(ColorUtil.argbHex(Color.ORANGE,0.8f));
+        System.out.println(ColorUtil.argbHex(new Color(-2130706433),0f));
     }
 
     @Test

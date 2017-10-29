@@ -17,7 +17,6 @@ public enum QrCodeDataShape {
         @Override
         public void draw(Graphics2D g2, int x, int y, int w, int h) {
             Ellipse2D.Float shape = new Ellipse2D.Float(x, y, w, h);
-//            g2.draw(shape);
             g2.fill(shape);
         }
     },TRIANGLE {
@@ -26,7 +25,6 @@ public enum QrCodeDataShape {
             int[] xpoints = {x, x + (w >> 1), x + w};
             int[] ypoints= {y + w, y, y + w};
             Polygon p = new Polygon(xpoints,ypoints,3);
-//            g2.draw(p);
             g2.fillPolygon(p);
         }
     };

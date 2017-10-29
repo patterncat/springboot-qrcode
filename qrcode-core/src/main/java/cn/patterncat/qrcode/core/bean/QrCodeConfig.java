@@ -170,6 +170,8 @@ public class QrCodeConfig {
         ValidationUtil.checkExpressionTrue(logoRadius > -1,"logoRadius should > -1");
         ValidationUtil.checkExpressionTrue(imageType != null,"imageType should not be null");
         ValidationUtil.checkExpressionTrue(errorCorrectionLevel != null,"errorCorrectionLevel should not be null");
+        ValidationUtil.checkExpressionTrue(dataShape != null,"dataShape should not be null");
+        ValidationUtil.checkExpressionTrue(bgImgOpacity >= 0f && bgImgOpacity <= 1.0f,"bgImgOpacity should >=0 and <= 1");
         //validate color
         try{
             getOffColorIntValue();
