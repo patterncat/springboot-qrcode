@@ -104,6 +104,9 @@ public class QrCodeConfig {
     @Builder.Default
     private ImageType imageType = ImageType.png;
 
+    @Builder.Default
+    private QrCodeDataShape dataShape = QrCodeDataShape.RECT;
+
     /**
      * 二维码纠错级别,默认high
      */

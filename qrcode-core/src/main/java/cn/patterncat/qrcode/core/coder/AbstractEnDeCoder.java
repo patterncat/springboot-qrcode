@@ -126,9 +126,10 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
 //        }
 //        int colorModel = BitMatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
         int colorModel = BufferedImage.TYPE_INT_ARGB;
-        return BitMatrixUtil.toColorBufferedImage(bitMatrixInfo,onColor,offColor,
-                config.getDetectOutColorIntValue(),config.getDetectInColorIntValue(),
-                colorModel);
+//        return BitMatrixUtil.toColorBufferedImage(bitMatrixInfo,onColor,offColor,
+//                config.getDetectOutColorIntValue(),config.getDetectInColorIntValue(),
+//                colorModel);
+        return BitMatrixUtil.toColorBufferedImage(bitMatrixInfo,config,colorModel);
     }
 
     protected void drawLogoOnQrCode(BufferedImage qrCode,QrCodeConfig config) throws IOException {

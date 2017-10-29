@@ -1,6 +1,7 @@
 package cn.patterncat.qrcode.core.bean;
 
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.encoder.QRCode;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,9 +18,15 @@ public class BitMatrixInfo {
 
     private BitMatrix detectInMatrix;
 
-//    private int quietZone;
-//
-//    private int multiple;
-//
-//    private QRCode qrCode;
+    private int topPadding;
+
+    private int leftPadding;
+
+    private int multiple;
+
+    private int outputWidth;
+
+    private int outputHeight;
+
+    private QRCode qrCode;
 }

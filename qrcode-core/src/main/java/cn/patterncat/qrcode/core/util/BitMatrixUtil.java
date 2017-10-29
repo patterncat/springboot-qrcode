@@ -1,13 +1,12 @@
 package cn.patterncat.qrcode.core.util;
 
-import cn.patterncat.qrcode.core.bean.BitMatrixInfo;
-import cn.patterncat.qrcode.core.bean.DetectInfo;
-import cn.patterncat.qrcode.core.bean.DetectPositionType;
-import cn.patterncat.qrcode.core.bean.InOutType;
+import cn.patterncat.qrcode.core.bean.*;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
 
@@ -56,6 +55,94 @@ public class BitMatrixUtil {
             }
         }
         image.setRGB(0, 0, width, height, pixels, 0, width);
+        return image;
+    }
+
+    /**
+     * 跟QrCodeConfig耦合的一个版本
+     * 支持二维码编码信息部分的形状定制
+     * @param bitMatrixInfo
+     * @param config
+     * @param colorModel
+     * @return
+     */
+    public static BufferedImage toColorBufferedImage(BitMatrixInfo bitMatrixInfo, QrCodeConfig config,
+                                                     int colorModel) {
+        BitMatrix matrix = bitMatrixInfo.getBitMatrix();
+        BitMatrix detectOut = bitMatrixInfo.getDetectOutMatrix();
+        BitMatrix detectIn = bitMatrixInfo.getDetectInMatrix();
+
+        int offColor = config.getOffColorIntValue();
+        int onColor = config.getOnColorIntValue();
+        int detectInColor = config.getDetectInColorIntValue();
+        int detectOutColor = config.getDetectOutColorIntValue();
+
+        int width = matrix.getWidth();
+        int height = matrix.getHeight();
+        BufferedImage image = new BufferedImage(width, height, colorModel);
+        Graphics2D g2 = image.createGraphics();
+        g2.setColor(new Color(offColor));
+        g2.fillRect(0, 0, width, height);
+        g2.setComposite(AlphaComposite.Src);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                //进行detect位置的颜色设置
+                boolean isDetectIn = detectIn.get(x,y);
+                boolean isDetectOut = detectOut.get(x,y);
+
+                //二维码颜色设置
+                if(matrix.get(x,y)){
+                    if(isDetectIn){
+                        g2.setColor(new Color(detectInColor));
+                        g2.fillRect(x,y,1,1);
+                    }else if(isDetectOut){
+                        g2.setColor(new Color(detectOutColor));
+                        g2.fillRect(x,y,1,1);
+                    }else{
+                        //数据区域单独处理
+                        //这里如果单独用g2.fill方法,w,h传1的话,只能处理矩形,这里的x,y粒度太小,最后组成看起来都叠加了
+                        if(QrCodeDataShape.RECT == config.getDataShape()){
+                            g2.setColor(new Color(onColor));
+                            g2.fillRect(x,y,1,1);
+                        }
+                    }
+                }else{
+                    g2.setColor(new Color(offColor));
+                }
+            }
+        }
+
+        //处理数据区域,非矩形的需要单独处理
+        if(QrCodeDataShape.RECT != config.getDataShape()){
+            ByteMatrix byteMatrix = bitMatrixInfo.getQrCode().getMatrix();
+            int multiple = bitMatrixInfo.getMultiple();
+            int byteWidth = byteMatrix.getWidth();
+            int byteHeight = byteMatrix.getHeight();
+
+            for(int x = 0; x < byteWidth; x++){
+                for(int y = 0; y < byteHeight; y++){
+                    if(byteMatrix.get(x,y) == 0){
+                        continue;
+                    }
+                    Optional<DetectInfo> optional = isDectectPosition(byteMatrix,x,y);
+                    if(optional.isPresent()){
+                        continue;
+                    }
+                    g2.setColor(new Color(onColor));
+                    config.getDataShape().draw(g2,
+                            bitMatrixInfo.getLeftPadding() + x * multiple,
+                            bitMatrixInfo.getTopPadding() + y * multiple,
+                            multiple,
+                            multiple);
+                }
+            }
+        }
+
+
+        g2.dispose();
+        image.flush();
         return image;
     }
 

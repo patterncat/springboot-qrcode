@@ -3,6 +3,7 @@ package cn.patterncat.qrcode.core;
 import cn.patterncat.qrcode.core.bean.ImageType;
 import cn.patterncat.qrcode.core.bean.PrettyArgbColors;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
+import cn.patterncat.qrcode.core.bean.QrCodeDataShape;
 import cn.patterncat.qrcode.core.coder.DefaultEnDeCoder;
 import cn.patterncat.qrcode.core.coder.QrCodeEnDeCoder;
 import com.google.zxing.ChecksumException;
@@ -124,9 +125,27 @@ public class QrCodeTest {
                 .size(400)
                 .detectInColor(PrettyArgbColors.LIGHT_RED_STR)
                 .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
-                .padding(1)
+                .padding(5)
                 .paddingStrict(true)
                 .logoRoundCorner(true)
+                .logoBroderSizeRatio(30)
+                .logo(bgImg)
+                .build();
+        enDeCoder.encodeAsFile(config,"out.jpg");
+    }
+
+    @Test
+    public void testDataShape() throws IOException, WriterException {
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg(msg)
+                .size(400)
+//                .dataShape(QrCodeDataShape.TRIANGLE)
+                .detectInColor(PrettyArgbColors.LIGHT_RED_STR)
+                .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
+                .padding(5)
+                .paddingStrict(true)
+                .logoRoundCorner(true)
+                .logoBroderSizeRatio(30)
                 .logo(bgImg)
                 .build();
         enDeCoder.encodeAsFile(config,"out.jpg");

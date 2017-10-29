@@ -90,7 +90,8 @@ public class DefaultQrCodeWriterQrCode implements QrCodeMatrixWriter {
         int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
         int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-        BitMatrixInfo wrapper = scaleUpQrCodeToOutputBitMatrix(input,inputWidth,inputHeight,
+        BitMatrixInfo wrapper = scaleUpQrCodeToOutputBitMatrix(input,code,
+                inputWidth,inputHeight,
                 outputWidth,outputHeight,multiple,
                 topPadding,leftPadding);
         return wrapper;
@@ -108,7 +109,8 @@ public class DefaultQrCodeWriterQrCode implements QrCodeMatrixWriter {
      * @param leftPadding
      * @return
      */
-    protected BitMatrixInfo scaleUpQrCodeToOutputBitMatrix(ByteMatrix input, int inputWidth, int inputHeight,
+    protected BitMatrixInfo scaleUpQrCodeToOutputBitMatrix(ByteMatrix input, QRCode qrCode,
+                                                           int inputWidth, int inputHeight,
                                                            int outputWidth, int outputHeight, int multiple,
                                                            int topPadding, int leftPadding){
         BitMatrix output = new BitMatrix(outputWidth, outputHeight);
@@ -139,6 +141,10 @@ public class DefaultQrCodeWriterQrCode implements QrCodeMatrixWriter {
                 .bitMatrix(output)
                 .detectInMatrix(detectIn)
                 .detectOutMatrix(detectOut)
+                .multiple(multiple)
+                .topPadding(topPadding)
+                .leftPadding(leftPadding)
+                .qrCode(qrCode)
                 .build();
     }
 }
