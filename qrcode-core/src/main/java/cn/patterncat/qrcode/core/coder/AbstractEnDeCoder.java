@@ -146,7 +146,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         }
         ImgUtil.coverImage(logoImg,qrCode,
                 config.getLogoSizeRatio(),config.getLogoSizeRatio(),
-                AlphaComposite.SrcAtop); //将logo覆盖过去
+                AlphaComposite.SrcAtop); //将logo覆盖过去,使用SrcAtop解决圆角时没有被背景色填充问题
     }
 
     protected BufferedImage coverQrCodeToBgImage(BufferedImage qrCode,QrCodeConfig config) throws IOException {

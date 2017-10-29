@@ -1,6 +1,7 @@
 package cn.patterncat.qrcode.core;
 
 import cn.patterncat.qrcode.core.bean.ImageType;
+import cn.patterncat.qrcode.core.bean.PrettyArgbColors;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.coder.DefaultEnDeCoder;
 import cn.patterncat.qrcode.core.coder.QrCodeEnDeCoder;
@@ -20,11 +21,17 @@ public class QrCodeTest {
 
     QrCodeEnDeCoder enDeCoder = new DefaultEnDeCoder();
 
+    String msg = "http://mvnrepository.com/artifact/org.apache.commons/commons-lang3";
+
+    String bgImg = "https://b-ssl.duitang.com/uploads/item/201406/05/20140605221928_s2Gyx.jpeg";
+
+    String logo = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1509853713&di=681de473c5a9510909cf963a3e716c48&imgtype=jpg&er=1&src=http%3A%2F%2Fm.qqzhi.com%2Fupload%2Fimg_1_2823257972D3596592729_23.jpg";
+
     @Test
     public void testGen() throws IOException, WriterException {
         //使用zxing默认的方法,如果msg不够长,则padding效果不明显,显示出来还是间距比较大
         QrCodeConfig config = QrCodeConfig.builder()
-                .msg("http://mvnrepository.com/artifact/org.apache.commons/commons-lang3")
+                .msg(msg)
                 .size(300)
                 .padding(30)
                 .paddingStrict(true)
@@ -33,14 +40,14 @@ public class QrCodeTest {
                 .imageType(ImageType.jpg)
                 .errorCorrectionLevel(ErrorCorrectionLevel.H)
                 .build();
-        enDeCoder.encodeAsFile(config,"testWithoutLogo.jpg");
+        enDeCoder.encodeAsFile(config,"out.jpg");
     }
 
     @Test
     public void testWithLogo() throws IOException, WriterException {
         //使用zxing默认的方法,如果msg不够长,则padding效果不明显,显示出来还是间距比较大
         QrCodeConfig config = QrCodeConfig.builder()
-                .msg("http://mvnrepository.com/artifact/org.apache.commons/commons-lang3")
+                .msg(msg)
                 .size(300)
                 .padding(1)
 //                .offColor("0xffffffff")
@@ -49,14 +56,14 @@ public class QrCodeTest {
                 .logoRoundCorner(true)
                 .logoBorder(true)
                 .logoBorderColor("0xffff0000")
-                .logo("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
+                .logo(logo)
 //                .logo(this.getClass().getClassLoader().getResource("logo.jpeg").getPath())
 //                .logoRadius(5)
                 .paddingStrict(true)
                 .imageType(ImageType.jpg)
                 .errorCorrectionLevel(ErrorCorrectionLevel.H)
                 .build();
-        enDeCoder.encodeAsFile(config,"testWithLogo.jpg");
+        enDeCoder.encodeAsFile(config,"out.jpg");
     }
 
     @Test
@@ -74,7 +81,7 @@ public class QrCodeTest {
     @Test
     public void testDetectColor() throws IOException, WriterException {
         QrCodeConfig config = QrCodeConfig.builder()
-                .msg("http://mvnrepository.com/artifact/org.apache.commons/commons-lang3")
+                .msg(msg)
                 .size(400)
                 .onColor("0xFFCD96CD")
                 .offColor("0x2687CEFF")
@@ -83,7 +90,7 @@ public class QrCodeTest {
                 .logoRoundCorner(true)
                 .logoBorder(true)
                 .logoBorderColor("0xffff0000")
-                .logo("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
+                .logo(logo)
                 .build();
         enDeCoder.encodeAsFile(config,"out.jpg");
     }
@@ -91,22 +98,36 @@ public class QrCodeTest {
     @Test
     public void testBgImg() throws IOException, WriterException {
         QrCodeConfig config = QrCodeConfig.builder()
-                .msg("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
+                .msg(msg)
                 .size(300)
-                .bgImage("https://b-ssl.duitang.com/uploads/item/201406/05/20140605221928_s2Gyx.jpeg")
-                .onColor("0xff0000ff")
-                .offColor("0x80ffffff")
+                .bgImage(bgImg)
+//                .onColor("0xff0000ff")
+//                .offColor("0x80ffffff")
                 .detectInColor("0xffff0000")
                 .detectOutColor("0xff00FF00")
                 .padding(1)
                 .paddingStrict(true)
-                .logoSizeRatio(3)
+//                .logoSizeRatio(3)
                 .logoRoundCorner(true)
                 .logoBorder(false)
 //                .logoRadius(45)
                 .logoBorderColor("0xffff0000")
-//                .logo("http://www.36588.com.cn:8080/ImageResourceMongo/UploadedFile/dimension/big/58e52e26-4664-4f48-8891-23223d9cd787.png")
-                .logo("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1509853713&di=681de473c5a9510909cf963a3e716c48&imgtype=jpg&er=1&src=http%3A%2F%2Fm.qqzhi.com%2Fupload%2Fimg_1_2823257972D3596592729_23.jpg")
+                .logo(logo)
+                .build();
+        enDeCoder.encodeAsFile(config,"out.jpg");
+    }
+
+    @Test
+    public void testPrettyColorQrCode() throws IOException, WriterException {
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg(msg)
+                .size(400)
+                .detectInColor(PrettyArgbColors.LIGHT_RED_STR)
+                .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
+                .padding(1)
+                .paddingStrict(true)
+                .logoRoundCorner(true)
+                .logo(bgImg)
                 .build();
         enDeCoder.encodeAsFile(config,"out.jpg");
     }
