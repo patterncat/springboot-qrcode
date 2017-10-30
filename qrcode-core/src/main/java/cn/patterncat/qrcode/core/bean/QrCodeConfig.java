@@ -106,6 +106,7 @@ public class QrCodeConfig {
 
     /**
      * 生成图片类型jpg或png
+     * 默认png,因为ImageIO对jpg在ragb下面有bug
      */
     @Builder.Default
     private ImageType imageType = ImageType.png;

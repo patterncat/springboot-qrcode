@@ -30,20 +30,31 @@ public class QrCodeTest {
 
     String logo = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1509853713&di=681de473c5a9510909cf963a3e716c48&imgtype=jpg&er=1&src=http%3A%2F%2Fm.qqzhi.com%2Fupload%2Fimg_1_2823257972D3596592729_23.jpg";
 
+    String outFile = "out";
+
+    public String getOutFile(QrCodeConfig config){
+        return outFile + "." + config.getImageType().name();
+    }
+
+    /**
+     * ImageIO生成jpg在ragb模式下有bug
+     * @throws IOException
+     * @throws WriterException
+     */
     @Test
-    public void testGen() throws IOException, WriterException {
+    public void testGenJpg() throws IOException, WriterException {
         //使用zxing默认的方法,如果msg不够长,则padding效果不明显,显示出来还是间距比较大
         QrCodeConfig config = QrCodeConfig.builder()
                 .msg(msg)
                 .size(300)
-                .padding(30)
-                .paddingStrict(true)
-                .offColor("0xffffffff")
-                .onColor("0xffff0000")
+//                .offColor("0x2687CEFF")
+                .detectInColor("0xFFFF6A6A")
+                .detectOutColor("0xFFC0FF3E")
+                .onColor(PrettyArgbColors.LIGHT_BLUE_STR)
                 .imageType(ImageType.jpg)
                 .errorCorrectionLevel(ErrorCorrectionLevel.H)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 
     @Test
@@ -51,22 +62,19 @@ public class QrCodeTest {
         //使用zxing默认的方法,如果msg不够长,则padding效果不明显,显示出来还是间距比较大
         QrCodeConfig config = QrCodeConfig.builder()
                 .msg(msg)
-                .size(300)
-                .padding(1)
-//                .offColor("0xffffffff")
-//                .onColor("0xffff0000")
-//                .logoRadius(20)
+                .size(400)
+                .onColor("0xFFCD96CD")
+                .offColor("0x2687CEFF")
+                .detectInColor("0xFFFF6A6A")
+                .detectOutColor("0xFFC0FF3E")
                 .logoRoundCorner(true)
                 .logoBorder(true)
                 .logoBorderColor("0xffff0000")
                 .logo(logo)
-//                .logo(this.getClass().getClassLoader().getResource("logo.jpeg").getPath())
-//                .logoRadius(5)
-                .paddingStrict(true)
-                .imageType(ImageType.jpg)
-                .errorCorrectionLevel(ErrorCorrectionLevel.H)
+                .imageType(ImageType.png)
+//                .errorCorrectionLevel(ErrorCorrectionLevel.H)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 
     @Test
@@ -95,7 +103,7 @@ public class QrCodeTest {
                 .logoBorderColor("0xffff0000")
                 .logo(logo)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 
     @Test
@@ -117,7 +125,7 @@ public class QrCodeTest {
                 .logoBorderColor("0xffff0000")
                 .logo(logo)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 
     @Test
@@ -134,7 +142,7 @@ public class QrCodeTest {
                 .logoBroderSizeRatio(30)
                 .logo(bgImg)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 
     @Test
@@ -154,7 +162,7 @@ public class QrCodeTest {
                 .logoBroderSizeRatio(30)
                 .logo(bgImg)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 
     @Test
@@ -169,7 +177,7 @@ public class QrCodeTest {
                 .padding(1)
                 .paddingStrict(true)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 
     @Test
@@ -177,17 +185,17 @@ public class QrCodeTest {
         QrCodeConfig config = QrCodeConfig.builder()
                 .msg(msg)
                 .size(400)
-//                .detectInColor(PrettyArgbColors.LIGHT_RED_STR)
-//                .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
-                .detectInColor(PrettyArgbColors.LIGHT_GREEN_STR)
-                .detectOutColor(PrettyArgbColors.LIGHT_GREEN_STR)
+                .detectInColor(PrettyArgbColors.LIGHT_RED_STR)
+                .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
+//                .detectInColor(PrettyArgbColors.LIGHT_GREEN_STR)
+//                .detectOutColor(PrettyArgbColors.LIGHT_GREEN_STR)
                 .padding(5)
                 .paddingStrict(true)
                 .logoRoundCorner(true)
                 .logoBroderSizeRatio(30)
                 .logo(bgImg)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 
     @Test
@@ -199,11 +207,12 @@ public class QrCodeTest {
                 .detectInColor(PrettyArgbColors.LIGHT_RED_STR)
                 .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
                 .padding(5)
+                .imageType(ImageType.png)
                 .paddingStrict(true)
                 .logoRoundCorner(true)
                 .logoBroderSizeRatio(30)
                 .logo(bgImg)
                 .build();
-        enDeCoder.encodeAsFile(config,"out.jpg");
+        enDeCoder.encodeAsFile(config,getOutFile(config));
     }
 }

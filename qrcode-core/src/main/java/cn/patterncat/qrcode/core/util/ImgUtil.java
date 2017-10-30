@@ -55,7 +55,7 @@ public class ImgUtil {
     public static BufferedImage addRoundedBorder(BufferedImage image,int radius,int borderSize,Color borderColor){
         int w = image.getWidth() + borderSize*2;
         int h = image.getHeight() + borderSize*2;
-        BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage output = new BufferedImage(w, h, image.getType());
         Graphics2D g2 = output.createGraphics();
         g2.setComposite(AlphaComposite.Src);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -76,7 +76,7 @@ public class ImgUtil {
     public static BufferedImage roundImageCorner(BufferedImage image, int radius) {
         int w = image.getWidth();
         int h = image.getHeight();
-        BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage output = new BufferedImage(w, h, image.getType());
         Graphics2D g2 = output.createGraphics();
         g2.setComposite(AlphaComposite.Src);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

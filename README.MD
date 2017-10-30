@@ -11,3 +11,4 @@
 ### rc2
 - 修复spring controller自动加载问题
 - 完善springboot-starter-qrcode
+- 修复jpg下二维码变黑问题,这是ImageIO的bug,[Colors appear wrong in image file if image type is TYPE_INT_ARGB and writing with ImageIO](https://stackoverflow.com/questions/23734280/colors-appear-wrong-in-image-file-if-image-type-is-type-int-argb-and-writing-wit).因而推荐png,效果好点

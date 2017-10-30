@@ -1,6 +1,7 @@
 package cn.patterncat.qrcode.core.coder;
 
 import cn.patterncat.qrcode.core.bean.BitMatrixInfo;
+import cn.patterncat.qrcode.core.bean.ImageType;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ImgUtil;
@@ -83,7 +84,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         int neededWidth = config.getSize();
         int neededHeight = config.getSize();
         if (qrCodeWidth != neededWidth || qrCodeHeight != neededHeight) {
-            BufferedImage tmp = new BufferedImage(neededWidth, neededHeight, BufferedImage.TYPE_INT_RGB);
+            BufferedImage tmp = new BufferedImage(neededWidth, neededHeight,qrCodeImg.getType());
             tmp.getGraphics().drawImage(
                     qrCodeImg.getScaledInstance(neededWidth, neededHeight,
                             Image.SCALE_SMOOTH), 0, 0, null);
@@ -110,7 +111,8 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
      * @return
      */
     protected BufferedImage drawQrCode(BitMatrixInfo bitMatrixInfo, QrCodeConfig config){
-        int colorModel = BufferedImage.TYPE_INT_ARGB;
+        //如果是image是jpg,则使用argb会变成黑色
+        int colorModel = config.getImageType() == ImageType.jpg ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
         return QrCodeGenerator.toColorBufferedImage(bitMatrixInfo,config,colorModel);
     }
 
