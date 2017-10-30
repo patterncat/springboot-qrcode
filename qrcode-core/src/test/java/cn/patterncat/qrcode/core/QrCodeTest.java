@@ -28,6 +28,8 @@ public class QrCodeTest {
 
     String bgImg = "https://b-ssl.duitang.com/uploads/item/201406/05/20140605221928_s2Gyx.jpeg";
 
+    String bgImg2 = "https://b-ssl.duitang.com/uploads/item/201406/08/20140608161416_tYfvB.jpeg";
+
     String logo = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1509853713&di=681de473c5a9510909cf963a3e716c48&imgtype=jpg&er=1&src=http%3A%2F%2Fm.qqzhi.com%2Fupload%2Fimg_1_2823257972D3596592729_23.jpg";
 
     String outFile = "out";
@@ -151,16 +153,16 @@ public class QrCodeTest {
                 .msg(msg)
                 .size(400)
                 .padding(1)
-                .bgImage(bgImg)
+                .bgImage(bgImg2)
                 .useBgImgColor(true)
                 .offColor(ColorUtil.argbHex(Color.WHITE,1F))
-//                .onColor(PrettyArgbColors.TRANSPARENT_STR)
-//                .detectInColor(PrettyArgbColors.LIGHT_GREEN_STR)
-//                .detectOutColor(PrettyArgbColors.LIGHT_GREEN_STR)
                 .paddingStrict(true)
                 .logoRoundCorner(true)
-                .logoBroderSizeRatio(30)
-                .logo(bgImg)
+                .logoBorder(false)
+//                .logoRadius(45)
+//                .logoBroderSizeRatio(30)
+                .logo(logo) //使用背景图颜色就不建议用logo了,或者需要选好logo边颜色
+                .logoBorder(true)
                 .build();
         enDeCoder.encodeAsFile(config,getOutFile(config));
     }

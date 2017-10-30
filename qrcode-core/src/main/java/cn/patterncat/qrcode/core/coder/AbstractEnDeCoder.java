@@ -5,7 +5,7 @@ import cn.patterncat.qrcode.core.bean.ImageType;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ImgUtil;
-import cn.patterncat.qrcode.core.util.QrCodeGenerator;
+import cn.patterncat.qrcode.core.util.QrCodeUtil;
 import cn.patterncat.qrcode.core.writer.DefaultQrCodeWriterQrCode;
 import cn.patterncat.qrcode.core.writer.QrCodeMatrixWriter;
 import cn.patterncat.qrcode.core.writer.StrictQuietZoneWriterQrCode;
@@ -96,6 +96,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
             qrCodeImg = coverQrCodeToBgImage(qrCodeImg,config);
         }
 
+        //设置完背景图再添加logo,使得logo覆盖正在上面,凸显出来
         if(config.hasLogo()){
             //添加logo
             drawLogoOnQrCode(qrCodeImg,config);
@@ -113,7 +114,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
     protected BufferedImage drawQrCode(BitMatrixInfo bitMatrixInfo, QrCodeConfig config){
         //如果是image是jpg,则使用argb会变成黑色
         int colorModel = config.getImageType() == ImageType.jpg ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-        return QrCodeGenerator.toColorBufferedImage(bitMatrixInfo,config,colorModel);
+        return QrCodeUtil.toColorBufferedImage(bitMatrixInfo,config,colorModel);
     }
 
     protected void drawLogoOnQrCode(BufferedImage qrCode,QrCodeConfig config) throws IOException {
@@ -146,7 +147,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
         }
         //将qrcode覆盖到背景图上
         if(config.isUseBgImgColor()){
-            return QrCodeGenerator.addBgImgAndUseBgImgAsQrCodeOnColor(dstImg,qrCode,config);
+            return QrCodeUtil.addBgImgAndUseBgImgAsQrCodeOnColor(dstImg,qrCode,config);
         }
         ImgUtil.coverImage(qrCode,dstImg,1,1,
                 AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,config.getBgImgOpacity()));

@@ -16,7 +16,7 @@ import java.util.Optional;
  * 避免重名困扰,将自己的MatrixUtil改为BitMatrixUtil
  * Created by patterncat on 2017-10-27.
  */
-public class QrCodeGenerator {
+public class QrCodeUtil {
 
     public static final int OUT_DETECT_RECT_SIZE = 7;
 
@@ -28,11 +28,12 @@ public class QrCodeGenerator {
         Graphics2D g2 = bgImg.createGraphics();
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,config.getBgImgOpacity()));
 
+        final int onColor = config.getOnColorIntValue();
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                int color = qrCode.getRGB(x,y);
-                //这里覆盖为使用背景色
-                if(color == config.getOnColorIntValue()){
+                int pointColor = qrCode.getRGB(x,y);
+                //这里将前景色覆盖为使用背景色
+                if(pointColor == onColor){
                     qrCode.setRGB(x,y,bgImg.getRGB(x,y));
                 }
             }
