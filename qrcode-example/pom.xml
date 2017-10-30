@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>cn.patterncat</groupId>
 			<artifactId>spring-boot-starter-qrcode</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 
 		<dependency>
