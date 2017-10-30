@@ -99,6 +99,12 @@ public class QrCodeConfig {
     private String detectInColor = BLACK;
 
     /**
+     * 如果这个为true,则使用bgImg的底色作为onColor
+     */
+    @Builder.Default
+    private boolean useBgImgColor = false;
+
+    /**
      * 生成图片类型jpg或png
      */
     @Builder.Default

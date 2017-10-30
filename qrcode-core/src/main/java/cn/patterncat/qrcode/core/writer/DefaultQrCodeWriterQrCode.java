@@ -1,20 +1,15 @@
 package cn.patterncat.qrcode.core.writer;
 
 import cn.patterncat.qrcode.core.bean.BitMatrixInfo;
-import cn.patterncat.qrcode.core.bean.DetectInfo;
-import cn.patterncat.qrcode.core.bean.InOutType;
-import cn.patterncat.qrcode.core.util.BitMatrixUtil;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * 从com.google.zxing.qrcode.QRCodeWriter拷贝基本方法过来
@@ -90,58 +85,18 @@ public class DefaultQrCodeWriterQrCode implements QrCodeMatrixWriter {
         int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
         int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-        BitMatrixInfo wrapper = scaleUpQrCodeToOutputBitMatrix(input,code,
-                inputWidth,inputHeight,
-                outputWidth,outputHeight,multiple,
-                topPadding,leftPadding);
-        return wrapper;
+        BitMatrixInfo bitMatrixInfo = buildOutputMatrixInfo(code,outputWidth,outputHeight,
+                multiple,topPadding,leftPadding);
+        return bitMatrixInfo;
     }
 
-    /**
-     * 按比例将原始qrcode的version对应的尺寸伸缩到指定的宽高
-     * @param input
-     * @param inputWidth
-     * @param inputHeight
-     * @param outputWidth
-     * @param outputHeight
-     * @param multiple
-     * @param topPadding
-     * @param leftPadding
-     * @return
-     */
-    protected BitMatrixInfo scaleUpQrCodeToOutputBitMatrix(ByteMatrix input, QRCode qrCode,
-                                                           int inputWidth, int inputHeight,
-                                                           int outputWidth, int outputHeight, int multiple,
-                                                           int topPadding, int leftPadding){
-        BitMatrix output = new BitMatrix(outputWidth, outputHeight);
-        //这样做省得去copy BitMatrix再做扩展,就是多了一点点内存开销
-        BitMatrix detectIn = new BitMatrix(outputWidth,outputHeight);
-        BitMatrix detectOut = new BitMatrix(outputWidth,outputHeight);
-
-        for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
-            // Write the contents of this row of the barcode
-            for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
-                if (input.get(inputX, inputY) == 1) {
-                    output.setRegion(outputX, outputY, multiple, multiple);
-                    //判断detect position,然后记录到bit matrix
-                    Optional<DetectInfo> optional = BitMatrixUtil.isDectectPosition(input,inputX,inputY);
-                    if(optional.isPresent()){
-                        DetectInfo detectInfo = optional.get();
-                        if(detectInfo.getInOutType() == InOutType.INNER){
-                            detectIn.setRegion(outputX, outputY, multiple, multiple);
-                        }else{
-                            detectOut.setRegion(outputX, outputY, multiple, multiple);
-                        }
-                    }
-                }
-            }
-        }
-
+    protected BitMatrixInfo buildOutputMatrixInfo(QRCode qrCode,
+                                                  int outputWidth, int outputHeight, int multiple,
+                                                  int topPadding, int leftPadding){
         return BitMatrixInfo.builder()
-                .bitMatrix(output)
-                .detectInMatrix(detectIn)
-                .detectOutMatrix(detectOut)
                 .multiple(multiple)
+                .outputWidth(outputWidth)
+                .outputHeight(outputHeight)
                 .topPadding(topPadding)
                 .leftPadding(leftPadding)
                 .qrCode(qrCode)

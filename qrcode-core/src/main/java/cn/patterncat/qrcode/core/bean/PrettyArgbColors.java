@@ -13,13 +13,10 @@ public class PrettyArgbColors {
 
     public static String LIGHT_GREEN_STR = "0xFF5FAC9A";
 
-    public static String TRANSPARENT_STR = "0x00FFFFFF";
-
     public static final Color LIGHT_BLUE = new Color(135,196,249,255);
 
     public static final Color LIGHT_RED = new Color(227,74,73,255);
 
     public static final Color LIGHT_GREEN = new Color(95,172,154,255);
 
-    public static final Color TRANSPARENT = new Color(255,255,255,0);
 }

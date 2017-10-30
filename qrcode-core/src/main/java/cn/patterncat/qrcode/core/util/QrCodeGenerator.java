@@ -16,47 +16,33 @@ import java.util.Optional;
  * 避免重名困扰,将自己的MatrixUtil改为BitMatrixUtil
  * Created by patterncat on 2017-10-27.
  */
-public class BitMatrixUtil {
+public class QrCodeGenerator {
 
     public static final int OUT_DETECT_RECT_SIZE = 7;
 
-    /**
-     * 主要将原来的getBufferedImageColorModel改为从参数传入进去
-     * 这里实现了二维码的着色
-     * @param bitMatrixInfo
-     * @param onColor
-     * @param offColor
-     * @param colorModel
-     * @return
-     */
-    public static BufferedImage toColorBufferedImage(BitMatrixInfo bitMatrixInfo, int onColor, int offColor,
-                                                int detectOutColor, int detectInColor,
-                                                int colorModel) {
-        BitMatrix matrix = bitMatrixInfo.getBitMatrix();
-        BitMatrix detectOut = bitMatrixInfo.getDetectOutMatrix();
-        BitMatrix detectIn = bitMatrixInfo.getDetectInMatrix();
+    public static BufferedImage addBgImgAndUseBgImgAsQrCodeOnColor(BufferedImage bgImg,
+                                                                   BufferedImage qrCode,QrCodeConfig config){
+        int width = qrCode.getWidth();
+        int height = qrCode.getHeight();
 
-        int width = matrix.getWidth();
-        int height = matrix.getHeight();
-        BufferedImage image = new BufferedImage(width, height, colorModel);
-        int[] pixels = new int[width * height];
-        int index = 0;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int targetOnColor = onColor;
-                //进行detect位置的颜色设置
-                if(detectIn.get(x,y)){
-                    targetOnColor = detectInColor;
-                }else if(detectOut.get(x,y)){
-                    targetOnColor = detectOutColor;
+        Graphics2D g2 = bgImg.createGraphics();
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,config.getBgImgOpacity()));
+
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                int color = qrCode.getRGB(x,y);
+                //这里覆盖为使用背景色
+                if(color == config.getOnColorIntValue()){
+                    qrCode.setRGB(x,y,bgImg.getRGB(x,y));
                 }
-                //二维码颜色设置
-                pixels[index++] = matrix.get(x, y) ? targetOnColor : offColor;
             }
         }
-        image.setRGB(0, 0, width, height, pixels, 0, width);
-        return image;
+        g2.drawImage(qrCode,0,0, width, height, null);
+        g2.dispose();
+        bgImg.flush();
+        return bgImg;
     }
+
 
     /**
      * 跟QrCodeConfig耦合的一个版本
@@ -68,78 +54,58 @@ public class BitMatrixUtil {
      */
     public static BufferedImage toColorBufferedImage(BitMatrixInfo bitMatrixInfo, QrCodeConfig config,
                                                      int colorModel) {
-        BitMatrix matrix = bitMatrixInfo.getBitMatrix();
-        BitMatrix detectOut = bitMatrixInfo.getDetectOutMatrix();
-        BitMatrix detectIn = bitMatrixInfo.getDetectInMatrix();
-
         int offColor = config.getOffColorIntValue();
         int onColor = config.getOnColorIntValue();
         int detectInColor = config.getDetectInColorIntValue();
         int detectOutColor = config.getDetectOutColorIntValue();
 
-        int width = matrix.getWidth();
-        int height = matrix.getHeight();
+        int width = bitMatrixInfo.getOutputWidth();
+        int height = bitMatrixInfo.getOutputHeight();
+
         BufferedImage image = new BufferedImage(width, height, colorModel);
         Graphics2D g2 = image.createGraphics();
+
         g2.setColor(new Color(offColor));
         g2.fillRect(0, 0, width, height);
         g2.setComposite(AlphaComposite.Src);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                //进行detect位置的颜色设置
-                boolean isDetectIn = detectIn.get(x,y);
-                boolean isDetectOut = detectOut.get(x,y);
+        ByteMatrix byteMatrix = bitMatrixInfo.getQrCode().getMatrix();
+        int multiple = bitMatrixInfo.getMultiple();
+        int byteWidth = byteMatrix.getWidth();
+        int byteHeight = byteMatrix.getHeight();
+        int leftPadding = bitMatrixInfo.getLeftPadding();
+        int topPadding = bitMatrixInfo.getTopPadding();
 
-                //二维码颜色设置
-                if(matrix.get(x,y)){
-                    if(isDetectIn){
-                        g2.setColor(new Color(detectInColor));
-                        g2.fillRect(x,y,1,1);
-                    }else if(isDetectOut){
-                        g2.setColor(new Color(detectOutColor));
-                        g2.fillRect(x,y,1,1);
-                    }else{
-                        //数据区域单独处理
-                        //这里如果单独用g2.fill方法,w,h传1的话,只能处理矩形,这里的x,y粒度太小,最后组成看起来都叠加了
-                        if(QrCodeDataShape.RECT == config.getDataShape()){
-                            g2.setColor(new Color(onColor));
-                            g2.fillRect(x,y,1,1);
-                        }
-                    }
-                }else{
+        //改为由原始信息,根据padding和multiple去画扩大后的二维码
+        for(int x = 0; x < byteWidth; x++){
+            for(int y = 0; y < byteHeight; y++){
+                int outputX = leftPadding + x * multiple;
+                int outputY = topPadding + y * multiple;
+                if(byteMatrix.get(x,y) == 0){
+                    //背景区域
                     g2.setColor(new Color(offColor));
+                    g2.fillRect(outputX,outputY,multiple,multiple);
+                    continue;
                 }
-            }
-        }
-
-        //处理数据区域,非矩形的需要单独处理
-        if(QrCodeDataShape.RECT != config.getDataShape()){
-            ByteMatrix byteMatrix = bitMatrixInfo.getQrCode().getMatrix();
-            int multiple = bitMatrixInfo.getMultiple();
-            int byteWidth = byteMatrix.getWidth();
-            int byteHeight = byteMatrix.getHeight();
-
-            for(int x = 0; x < byteWidth; x++){
-                for(int y = 0; y < byteHeight; y++){
-                    if(byteMatrix.get(x,y) == 0){
-                        continue;
+                //余下的都是有信息的区域
+                Optional<DetectInfo> optional = isDectectPosition(byteMatrix,x,y);
+                if(optional.isPresent()){
+                    //detect区域
+                    if(InOutType.OUTER == optional.get().getInOutType()){
+                        g2.setColor(new Color(detectOutColor));
+                    }else{
+                        g2.setColor(new Color(detectInColor));
                     }
-                    Optional<DetectInfo> optional = isDectectPosition(byteMatrix,x,y);
-                    if(optional.isPresent()){
-                        continue;
-                    }
+                    g2.fillRect(outputX,outputY,multiple,multiple);
+                    continue;
+                }else{
+                    //数据区域
                     g2.setColor(new Color(onColor));
-                    config.getDataShape().draw(g2,
-                            bitMatrixInfo.getLeftPadding() + x * multiple,
-                            bitMatrixInfo.getTopPadding() + y * multiple,
-                            multiple,
-                            multiple);
+                    config.getDataShape().draw(g2,outputX,outputY,multiple,multiple);
                 }
             }
         }
-
 
         g2.dispose();
         image.flush();

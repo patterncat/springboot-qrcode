@@ -1,0 +1,5 @@
+## tag
+- beta01
+这个版本是根据zxing里头的MatrixToImageWriter.java的二维码生成方式改造
+- beta02
+这个版本抛弃了zxing里头的MatrixToImageWriter.java的思路,自己去根据multiple去重新绘制伸缩后的二维码

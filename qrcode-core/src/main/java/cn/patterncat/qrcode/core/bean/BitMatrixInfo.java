@@ -12,11 +12,11 @@ import lombok.Data;
 @Builder
 public class BitMatrixInfo {
 
-    private BitMatrix bitMatrix;
+//    private BitMatrix bitMatrix;
 
-    private BitMatrix detectOutMatrix;
+//    private BitMatrix detectOutMatrix;
 
-    private BitMatrix detectInMatrix;
+//    private BitMatrix detectInMatrix;
 
     private int topPadding;
 

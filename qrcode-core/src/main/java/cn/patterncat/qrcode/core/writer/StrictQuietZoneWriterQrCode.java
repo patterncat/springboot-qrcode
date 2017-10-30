@@ -37,10 +37,8 @@ public class StrictQuietZoneWriterQrCode extends DefaultQrCodeWriterQrCode {
         int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
         int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-        BitMatrixInfo wrapper = scaleUpQrCodeToOutputBitMatrix(input,code,
-                inputWidth,inputHeight,
-                outputWidth,outputHeight,multiple,
-                topPadding,leftPadding);
-        return wrapper;
+        BitMatrixInfo bitMatrixInfo = buildOutputMatrixInfo(code,outputWidth,outputHeight,
+                multiple,topPadding,leftPadding);
+        return bitMatrixInfo;
     }
 }

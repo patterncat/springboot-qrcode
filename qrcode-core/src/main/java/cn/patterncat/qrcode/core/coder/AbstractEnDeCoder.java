@@ -4,14 +4,12 @@ import cn.patterncat.qrcode.core.bean.BitMatrixInfo;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ImgUtil;
-import cn.patterncat.qrcode.core.util.BitMatrixUtil;
+import cn.patterncat.qrcode.core.util.QrCodeGenerator;
 import cn.patterncat.qrcode.core.writer.DefaultQrCodeWriterQrCode;
 import cn.patterncat.qrcode.core.writer.QrCodeMatrixWriter;
 import cn.patterncat.qrcode.core.writer.StrictQuietZoneWriterQrCode;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
-import com.google.zxing.client.j2se.MatrixToImageConfig;
-import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
@@ -61,9 +59,7 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
     }
 
     protected BitMatrixInfo encodeMsgToMatrix(QrCodeConfig config) throws WriterException {
-//        QRCode qrCode = Encoder.encode(config.getMsg(), config.getErrorCorrectionLevel(),config.buildEncodeHints());
         if(config.isPaddingStrict()){
-//            bitMatrix = strictQuietZoneWriter.renderResult(qrCode,config.getSize(),config.getSize(),config.getPadding());
             return strictQuietZoneWriter.encode(config.getMsg(), BarcodeFormat.QR_CODE,config.getSize(),config.getSize(),config.buildEncodeHints());
         }
         return defaultWriter.encode(config.getMsg(), BarcodeFormat.QR_CODE,config.getSize(),config.getSize(),config.buildEncodeHints());
@@ -77,9 +73,8 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
      * @return
      */
     protected BufferedImage decorate(QrCodeConfig config,BitMatrixInfo bitMatrixInfo) throws IOException {
-        BitMatrix bitMatrix = bitMatrixInfo.getBitMatrix();
-        int qrCodeWidth = bitMatrix.getWidth();
-        int qrCodeHeight = bitMatrix.getHeight();
+        int qrCodeWidth = bitMatrixInfo.getOutputWidth();
+        int qrCodeHeight = bitMatrixInfo.getOutputHeight();
 
         //绘制qrcode的前景色及背景色
         BufferedImage qrCodeImg = drawQrCode(bitMatrixInfo,config);
@@ -115,21 +110,8 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
      * @return
      */
     protected BufferedImage drawQrCode(BitMatrixInfo bitMatrixInfo, QrCodeConfig config){
-        int onColor = config.getOnColorIntValue();
-        int offColor = config.getOffColorIntValue();
-        //如果有logo的话,则在可以使用binary的情况下,不使用binary,不然logo会变成黑色
-//        boolean useBinaryIfMatch = true;
-//        if(config.hasLogo()
-//                || config.getDetectInColorIntValue() != MatrixToImageConfig.BLACK
-//                || config.getDetectOutColorIntValue() != MatrixToImageConfig.BLACK){
-//            useBinaryIfMatch = false;
-//        }
-//        int colorModel = BitMatrixUtil.getBufferedImageColorModel(onColor,offColor,useBinaryIfMatch);
         int colorModel = BufferedImage.TYPE_INT_ARGB;
-//        return BitMatrixUtil.toColorBufferedImage(bitMatrixInfo,onColor,offColor,
-//                config.getDetectOutColorIntValue(),config.getDetectInColorIntValue(),
-//                colorModel);
-        return BitMatrixUtil.toColorBufferedImage(bitMatrixInfo,config,colorModel);
+        return QrCodeGenerator.toColorBufferedImage(bitMatrixInfo,config,colorModel);
     }
 
     protected void drawLogoOnQrCode(BufferedImage qrCode,QrCodeConfig config) throws IOException {
@@ -161,12 +143,12 @@ public abstract class AbstractEnDeCoder implements QrCodeEnDeCoder {
                     , 0, 0, null);
         }
         //将qrcode覆盖到背景图上
+        if(config.isUseBgImgColor()){
+            return QrCodeGenerator.addBgImgAndUseBgImgAsQrCodeOnColor(dstImg,qrCode,config);
+        }
         ImgUtil.coverImage(qrCode,dstImg,1,1,
                 AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,config.getBgImgOpacity()));
         return dstImg;
-//        ImgUtil.coverImage(bgImage,qrCode,1,1,
-//                AlphaComposite.getInstance(AlphaComposite.DST_ATOP,config.getBgImgOpacity()));
-//        return qrCode;
     }
 
     /**
