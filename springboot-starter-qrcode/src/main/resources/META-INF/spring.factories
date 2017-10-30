@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.patterncat.qrcode.web.QrCodeAutoConfiguration
+cn.patterncat.qrcode.QrCodeAutoConfiguration

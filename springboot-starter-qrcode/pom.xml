@@ -5,11 +5,11 @@
 
 	<groupId>cn.patterncat</groupId>
 	<artifactId>spring-boot-starter-qrcode</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
-	<name>springboot-starter-qrcode</name>
-	<description>springboot-starter-qrcode</description>
+	<name>spring-boot-starter-qrcode</name>
+	<description>spring-boot-starter-qrcode</description>
 	<url>https://github.com/patterncat/springboot-qrcode</url>
 
 	<dependencyManagement>
@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>cn.patterncat</groupId>
 			<artifactId>qrcode-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 
 		<dependency>

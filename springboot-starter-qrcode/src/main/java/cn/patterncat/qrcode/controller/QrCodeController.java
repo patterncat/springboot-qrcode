@@ -1,4 +1,4 @@
-package cn.patterncat.qrcode.web.controller;
+package cn.patterncat.qrcode.controller;
 
 import cn.patterncat.qrcode.core.bean.ImageType;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
@@ -7,31 +7,30 @@ import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Generated;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
  * Created by patterncat on 2017-10-27.
  */
-@Controller
+@ConditionalOnProperty(
+        name = "qrcode.web.enabled",
+        havingValue = "true",
+        matchIfMissing = false
+)
+@RestController
 @RequestMapping("/qrcode")
-//@ConditionalOnProperty(
-//        prefix = "qrcode",
-//        name = "web",
-//        havingValue = "true",
-//        matchIfMissing = false
-//)
 public class QrCodeController {
 
     @Autowired
     QrCodeEnDeCoder qrCodeEnDeCoder;
 
-    @Generated(value = "")
+    @GetMapping(value = "")
     public void generate(@RequestParam String content,
                          @RequestParam(required = false) Integer size,
                          @RequestParam(required = false) String logoUrl,
