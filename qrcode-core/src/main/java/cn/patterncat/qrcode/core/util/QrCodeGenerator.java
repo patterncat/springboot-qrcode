@@ -47,10 +47,10 @@ public class QrCodeGenerator {
     /**
      * 跟QrCodeConfig耦合的一个版本
      * 支持二维码编码信息部分的形状定制
-     * @param bitMatrixInfo
-     * @param config
-     * @param colorModel
-     * @return
+     * @param bitMatrixInfo matrix的信息
+     * @param config 配置对象
+     * @param colorModel 颜色模型
+     * @return 返回生成的BufferedImage
      */
     public static BufferedImage toColorBufferedImage(BitMatrixInfo bitMatrixInfo, QrCodeConfig config,
                                                      int colorModel) {
@@ -115,7 +115,10 @@ public class QrCodeGenerator {
     /**
      * 由于getBufferedImageColorModel方法是保包内访问权限,这里在默认onColor和offColor的时候,设置为了TYPE_BYTE_BINARY
      * 这里提供个参数来设置
-     * @return
+     * @param onColor 前景色
+     * @param offColor 背景色
+     * @param useBinaryIfMatch 匹配到binary的话,是否优先使用
+     * @return 返回最佳的颜色类型
      */
     public static int getBufferedImageColorModel(int onColor,int offColor,boolean useBinaryIfMatch){
         if (onColor == MatrixToImageConfig.BLACK && offColor == MatrixToImageConfig.WHITE) {
@@ -147,10 +150,10 @@ public class QrCodeGenerator {
      *   1 0 0 0 0 0 1
      *   1 1 1 1 1 1 1
      * 如果不获取方位,则这个方法可以简写一下,合并if条件
-     * @param byteMatrix
-     * @param x
-     * @param y
-     * @return
+     * @param byteMatrix byte矩阵
+     * @param x 坐标x
+     * @param y 坐标y
+     * @return DetectInfo,optional类型
      */
     public static Optional<DetectInfo> isDectectPosition(ByteMatrix byteMatrix, int x, int y){
         int width = byteMatrix.getWidth();

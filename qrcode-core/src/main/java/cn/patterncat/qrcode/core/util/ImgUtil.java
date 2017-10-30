@@ -16,12 +16,12 @@ public class ImgUtil {
     /**
      * 将srcImg叠加到dstImg上
      * 直接修改dstImg
-     * @param srcImg
-     * @param dstImg
-     * @param widthRatio
-     * @param heightRatio
-     * @return
-     * @throws IOException
+     * @param srcImg 源image
+     * @param dstImg 目标image
+     * @param widthRatio 宽度比例
+     * @param heightRatio 高度比例
+     * @param composite composite类型
+     * @throws IOException 抛出IO异常
      */
     public static void coverImage(BufferedImage srcImg,BufferedImage dstImg,
                                   int widthRatio,int heightRatio,
@@ -46,11 +46,11 @@ public class ImgUtil {
 
     /**
      * 添加圆角边框
-     * @param image
-     * @param radius
-     * @param borderSize
-     * @param borderColor
-     * @return
+     * @param image 源image
+     * @param radius 边角弧度
+     * @param borderSize 边框大小
+     * @param borderColor 边框颜色
+     * @return 返回修改后的BufferedImage
      */
     public static BufferedImage addRoundedBorder(BufferedImage image,int radius,int borderSize,Color borderColor){
         int w = image.getWidth() + borderSize*2;
@@ -69,9 +69,9 @@ public class ImgUtil {
 
     /**
      * 将图形圆角化
-     * @param image
+     * @param image 源image
      * @param radius 圆角的弧度
-     * @return
+     * @return 返回修改后的BufferedImage
      */
     public static BufferedImage roundImageCorner(BufferedImage image, int radius) {
         int w = image.getWidth();
@@ -91,9 +91,9 @@ public class ImgUtil {
     /**
      * 从path或url读取图片
      * 从网络读取的话,这里是没有显示设置超时时间的,需要注意
-     * @param location
-     * @return
-     * @throws IOException
+     * @param location 图片地址或网址
+     * @return 返回修改后的BufferedImage
+     * @throws IOException 抛出IO异常
      */
     public static BufferedImage fromPathOrUrl(String location) throws IOException {
         if(location.startsWith("http")){

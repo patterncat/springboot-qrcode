@@ -15,8 +15,8 @@ import java.util.Map;
 /**
  * Created by patterncat on 2017-10-26.
  */
-@Data
-@Builder
+@lombok.Data
+@lombok.Builder
 public class QrCodeConfig {
 
     public static final int DEFAULT_IMG_SIZE = 200;
@@ -224,7 +224,7 @@ public class QrCodeConfig {
         return ColorUtil.argbString2Int(this.logoBorderColor);
     }
 
-    public static class InternalBuilder extends QrCodeConfigBuilder {
+    public static class InternalBuilder extends QrCodeConfig.QrCodeConfigBuilder {
         InternalBuilder() {
             super();
         }
@@ -236,7 +236,7 @@ public class QrCodeConfig {
         }
     }
 
-    public static QrCodeConfigBuilder builder() {
+    public static QrCodeConfig.QrCodeConfigBuilder builder() {
         return new InternalBuilder();
     }
 

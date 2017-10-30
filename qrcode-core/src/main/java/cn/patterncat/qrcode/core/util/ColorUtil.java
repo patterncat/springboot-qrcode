@@ -9,8 +9,8 @@ public class ColorUtil {
 
     /**
      * 必须是Ox开头
-     * @param argb
-     * @return
+     * @param argb string类型的argb
+     * @return 返回int类型
      */
     public static int argbString2Int(String argb){
         return Long.decode(argb).intValue();
@@ -18,8 +18,8 @@ public class ColorUtil {
 
     /**
      * 转换为color对象
-     * @param argb
-     * @return
+     * @param argb string类型
+     * @return Color对象
      */
     public static Color argb2Color(String argb){
         int color = argbString2Int(argb);
@@ -32,8 +32,8 @@ public class ColorUtil {
 
     /**
      * 判断是否有alpha
-     * @param argb
-     * @return
+     * @param argb int类型
+     * @return 是否有透明度
      */
     public static boolean hasTransparency(int argb) {
         return (argb & 0xFF000000) != 0xFF000000;
@@ -43,8 +43,8 @@ public class ColorUtil {
      * 将浮点的不透明度转换为ragb的16进制值
      * 比如1.0 -- FF
      * 0.95 -- F2
-     * @param opacity
-     * @return
+     * @param opacity 不透明度
+     * @return 返回十六进制的string类型
      */
     public static String opacity2AlphaHex(float opacity){
         if(opacity > 1.0f || opacity < 0f){
@@ -60,9 +60,9 @@ public class ColorUtil {
 
     /**
      * 将现有的color常量加上opacity,构造成argb color
-     * @param color
-     * @param opacity
-     * @return
+     * @param color java的Color类
+     * @param opacity 浮点的不透明度
+     * @return Color对象
      */
     public static Color argb(Color color,float opacity){
         if(opacity > 1.0f || opacity < 0f){
@@ -74,10 +74,10 @@ public class ColorUtil {
 
     /**
      * 转换为字符型
-     * 比如Color.ORANGE,0.8f --> 0xCCFFC800
-     * @param color
-     * @param opacity
-     * @return
+     * 比如Color.ORANGE,0.8f -- 0xCCFFC800
+     * @param color 对象类型
+     * @param opacity 浮点类型
+     * @return 返回十六进制的color
      */
     public static String argbHex(Color color,float opacity){
         Color argb = argb(color, opacity);
