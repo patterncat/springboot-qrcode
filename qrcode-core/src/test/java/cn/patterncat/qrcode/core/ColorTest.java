@@ -1,10 +1,14 @@
 package cn.patterncat.qrcode.core;
 
 import cn.patterncat.qrcode.core.bean.PrettyArgbColors;
+import cn.patterncat.qrcode.core.color.GradientColor;
+import cn.patterncat.qrcode.core.color.GradientType;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import org.junit.Test;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Created by patterncat on 2017-10-26.
@@ -64,5 +68,15 @@ public class ColorTest {
         System.out.println(PrettyArgbColors.LIGHT_GREEN.getGreen());
         System.out.println(PrettyArgbColors.LIGHT_GREEN.getBlue());
         System.out.println(PrettyArgbColors.LIGHT_GREEN.getAlpha());
+    }
+
+    @Test
+    public void testGetGradientRgb(){
+        GradientColor color = new GradientColor(100,100, BufferedImage.TYPE_INT_RGB,GradientType.LEFT_TOP_RIGHT_DOWN,Color.YELLOW,Color.WHITE);
+        for(int x = 0; x < color.getWidth();x++){
+            for(int y = 0; y < color.getHeight();y++){
+                System.out.println(color.getRGB(x,y));
+            }
+        }
     }
 }

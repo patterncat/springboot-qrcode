@@ -1,5 +1,8 @@
 ## tag
 
+### v0.0.3
+- 支持gradient color
+
 ### v0.0.2
 - 修复圆角黑色问题
 - 重命名util

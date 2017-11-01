@@ -1,6 +1,8 @@
 package cn.patterncat.qrcode.core.util;
 
 import cn.patterncat.qrcode.core.bean.*;
+import cn.patterncat.qrcode.core.color.GradientColor;
+import cn.patterncat.qrcode.core.color.GradientType;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
@@ -57,6 +59,7 @@ public class QrCodeUtil {
                                                      int colorModel) {
         int offColor = config.getOffColorIntValue();
         int onColor = config.getOnColorIntValue();
+        int gradientOnColor = config.getGradientOnColorIntValue();
         int detectInColor = config.getDetectInColorIntValue();
         int detectOutColor = config.getDetectOutColorIntValue();
 
@@ -77,6 +80,14 @@ public class QrCodeUtil {
         int byteHeight = byteMatrix.getHeight();
         int leftPadding = bitMatrixInfo.getLeftPadding();
         int topPadding = bitMatrixInfo.getTopPadding();
+
+        //渐变色处理
+        GradientColor gradient = null;
+        Color targetOnColor = new Color(onColor);
+        if(gradientOnColor != onColor){
+            gradient = new GradientColor(byteWidth,byteHeight,colorModel,config.getGradientType(),
+                    new Color(onColor),new Color(gradientOnColor));
+        }
 
         //改为由原始信息,根据padding和multiple去画扩大后的二维码
         for(int x = 0; x < byteWidth; x++){
@@ -102,7 +113,10 @@ public class QrCodeUtil {
                     continue;
                 }else{
                     //数据区域
-                    g2.setColor(new Color(onColor));
+                    if(gradient != null){
+                        targetOnColor = new Color(gradient.getRGB(x,y));
+                    }
+                    g2.setColor(targetOnColor);
                     config.getDataShape().draw(g2,outputX,outputY,multiple,multiple);
                 }
             }

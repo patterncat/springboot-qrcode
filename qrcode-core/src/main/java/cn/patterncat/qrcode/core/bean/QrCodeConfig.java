@@ -1,5 +1,6 @@
 package cn.patterncat.qrcode.core.bean;
 
+import cn.patterncat.qrcode.core.color.GradientType;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import cn.patterncat.qrcode.core.util.ValidationUtil;
 import com.google.zxing.EncodeHintType;
@@ -74,6 +75,18 @@ public class QrCodeConfig {
      */
     @Builder.Default
     private String onColor = BLACK;
+
+    /**
+     * oncolor渐变色,两者一样则不渐变
+     */
+    @Builder.Default
+    private String gradientOnColor = BLACK;
+
+    /**
+     * 默认的渐变类似从左上角到右下角
+     */
+    @Builder.Default
+    private GradientType gradientType = GradientType.LEFT_TOP_RIGHT_DOWN;
 
     /**
      * 背景图片
@@ -183,6 +196,7 @@ public class QrCodeConfig {
         try{
             getOffColorIntValue();
             getOnColorIntValue();
+            getGradientOnColorIntValue();
             getDetectInColor();
             getDetectOutColor();
             getLogoBorderColorIntValue();
@@ -210,6 +224,10 @@ public class QrCodeConfig {
 
     public int getOnColorIntValue(){
         return ColorUtil.argbString2Int(this.onColor);
+    }
+
+    public int getGradientOnColorIntValue(){
+        return ColorUtil.argbString2Int(this.gradientOnColor);
     }
 
     public int getDetectOutColorIntValue(){

@@ -6,6 +6,7 @@ import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.bean.QrCodeDataShape;
 import cn.patterncat.qrcode.core.coder.DefaultEnDeCoder;
 import cn.patterncat.qrcode.core.coder.QrCodeEnDeCoder;
+import cn.patterncat.qrcode.core.color.GradientType;
 import cn.patterncat.qrcode.core.util.ColorUtil;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
@@ -49,6 +50,7 @@ public class QrCodeTest {
         QrCodeConfig config = QrCodeConfig.builder()
                 .msg(msg)
                 .size(300)
+                .gradientOnColor(PrettyArgbColors.LIGHT_RED_STR)
 //                .offColor("0x2687CEFF")
                 .detectInColor("0xFFFF6A6A")
                 .detectOutColor("0xFFC0FF3E")
@@ -210,6 +212,25 @@ public class QrCodeTest {
                 .detectOutColor(PrettyArgbColors.LIGHT_RED_STR)
                 .padding(5)
                 .imageType(ImageType.png)
+                .paddingStrict(true)
+                .logoRoundCorner(true)
+                .logoBroderSizeRatio(30)
+                .logo(bgImg)
+                .build();
+        enDeCoder.encodeAsFile(config,getOutFile(config));
+    }
+
+    @Test
+    public void testGradientColor() throws IOException, WriterException {
+        QrCodeConfig config = QrCodeConfig.builder()
+                .msg(msg)
+                .size(400)
+                .padding(5)
+                .onColor(PrettyArgbColors.LIGHT_GREEN_STR)
+                .gradientOnColor(PrettyArgbColors.LIGHT_RED_STR)
+                .gradientType(GradientType.TOP_DOWN)
+                .detectInColor(PrettyArgbColors.LIGHT_GREEN_STR)
+                .detectOutColor(PrettyArgbColors.LIGHT_GREEN_STR)
                 .paddingStrict(true)
                 .logoRoundCorner(true)
                 .logoBroderSizeRatio(30)
