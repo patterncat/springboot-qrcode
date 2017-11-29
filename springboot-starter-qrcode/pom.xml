@@ -5,7 +5,7 @@
 
 	<groupId>cn.patterncat</groupId>
 	<artifactId>spring-boot-starter-qrcode</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>jar</packaging>
 
 	<name>spring-boot-starter-qrcode</name>

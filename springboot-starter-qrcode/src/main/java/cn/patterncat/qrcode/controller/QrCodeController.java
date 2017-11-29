@@ -3,6 +3,7 @@ package cn.patterncat.qrcode.controller;
 import cn.patterncat.qrcode.core.bean.ImageType;
 import cn.patterncat.qrcode.core.bean.QrCodeConfig;
 import cn.patterncat.qrcode.core.coder.QrCodeEnDeCoder;
+import cn.patterncat.qrcode.core.color.GradientType;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,12 @@ public class QrCodeController {
                          @RequestParam(required = false) Integer size,
                          @RequestParam(required = false) Integer padding,
                          @RequestParam(required = false,defaultValue = "true") Boolean paddingStrict,
+                         @RequestParam(required = false) String onColor,
+                         @RequestParam(required = false) String offColor,
+                         @RequestParam(required = false) String detectInColor,
+                         @RequestParam(required = false) String detectOutColor,
+                         @RequestParam(required = false) String gradientOnColor,
+                         @RequestParam(required = false) GradientType gradientType,
                          @RequestParam(required = false) String logoUrl,
                          @RequestParam(required = false) Integer logoSizeRatio,
                          @RequestParam(required = false,defaultValue = "true") Boolean logoRound,
@@ -58,6 +65,24 @@ public class QrCodeController {
         if(padding != null){
             config.setPadding(padding);
             config.setPaddingStrict(paddingStrict);
+        }
+        if(StringUtils.isNotBlank(onColor)){
+            config.setOnColor(onColor);
+        }
+        if(StringUtils.isNotBlank(offColor)){
+            config.setOffColor(offColor);
+        }
+        if(StringUtils.isNotBlank(detectInColor)){
+            config.setDetectInColor(detectInColor);
+        }
+        if(StringUtils.isNotBlank(detectOutColor)){
+            config.setDetectOutColor(detectOutColor);
+        }
+        if(StringUtils.isNotBlank(gradientOnColor)){
+            config.setGradientOnColor(gradientOnColor);
+        }
+        if(gradientType != null){
+            config.setGradientType(gradientType);
         }
         if(logoSizeRatio != null){
             config.setLogoSizeRatio(logoSizeRatio);

@@ -1,4 +1,6 @@
 ## tag
+### v0.0.4
+- add more param in controller
 
 ### v0.0.3
 - 支持gradient color
