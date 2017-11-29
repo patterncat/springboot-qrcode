@@ -1,4 +1,7 @@
 ## tag
+### v0.0.5
+- add bgimg param in controller
+
 ### v0.0.4
 - add more param in controller
 

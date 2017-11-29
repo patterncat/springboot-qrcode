@@ -44,6 +44,10 @@ public class QrCodeController {
                          @RequestParam(required = false) String detectOutColor,
                          @RequestParam(required = false) String gradientOnColor,
                          @RequestParam(required = false) GradientType gradientType,
+                         @RequestParam(required = false) String bgImgUrl,
+                         @RequestParam(required = false,defaultValue = "false") Boolean useBgImgColor,
+                         @RequestParam(required = false) Float bgImgOpacity,
+                         @RequestParam(required = false) ErrorCorrectionLevel errorCorrectionLevel,
                          @RequestParam(required = false) String logoUrl,
                          @RequestParam(required = false) Integer logoSizeRatio,
                          @RequestParam(required = false,defaultValue = "true") Boolean logoRound,
@@ -83,6 +87,18 @@ public class QrCodeController {
         }
         if(gradientType != null){
             config.setGradientType(gradientType);
+        }
+        if(StringUtils.isNotBlank(bgImgUrl)){
+            config.setBgImage(bgImgUrl);
+            if(useBgImgColor != null){
+                config.setUseBgImgColor(useBgImgColor);
+            }
+            if(bgImgOpacity != null){
+                config.setBgImgOpacity(bgImgOpacity);
+            }
+        }
+        if(errorCorrectionLevel != null){
+            config.setErrorCorrectionLevel(errorCorrectionLevel);
         }
         if(logoSizeRatio != null){
             config.setLogoSizeRatio(logoSizeRatio);
