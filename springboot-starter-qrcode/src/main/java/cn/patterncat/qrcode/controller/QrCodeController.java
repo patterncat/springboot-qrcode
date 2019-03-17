@@ -20,11 +20,6 @@ import java.io.IOException;
 /**
  * Created by patterncat on 2017-10-27.
  */
-@ConditionalOnProperty(
-        name = "qrcode.web.enabled",
-        havingValue = "true",
-        matchIfMissing = false
-)
 @RestController
 @RequestMapping("/qrcode")
 public class QrCodeController {

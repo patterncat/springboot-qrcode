@@ -1,4 +1,7 @@
 ## tag
+### v1.0.0
+- update to jdk11 and spring boot 2.1.3.RELEASE
+
 ### v0.0.5
 - add bgimg param in controller
 
